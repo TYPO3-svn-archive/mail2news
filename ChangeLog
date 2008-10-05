@@ -1,0 +1,7 @@
+(add new changes on top of this file)
+
+08-10-01 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Initial release v0.1.0 beta
+	* Support multiple images per message
+	* Blocks unallowed script access through HTTP (only shell/cron access allowed)
