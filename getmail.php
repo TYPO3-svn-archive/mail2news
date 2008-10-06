@@ -61,6 +61,18 @@ function matchemail($match,$email) {
 	return FALSE;
 }
 
+/**
+*	Clear page cache of $pid_list
+*	$pid_list can be a comma separated list of id's
+*/
+function clearpagecache($pid_list) {
+	$tce = t3lib_div::makeInstance('t3lib_TCEmain');
+	$pid_array = explode(',',$pid_list);
+	foreach ($pid_array as $pid) {
+		$tce->clear_cacheCmd($pid);
+	}
+} 
+
 function getmail($extConf) {
 
 	$result = array();
@@ -225,6 +237,12 @@ foreach ($result as $newsitem) {
 	}
 	// echo actions for logfile
 	echo date("Y-m-d H:i:s ") . 'News item created: "' . $newsitem["title"] . '", ' . $newsitem["author"] . "\n";
+	
+}
+
+// Clear page cache for pages set in extConf, if new records are not hidden
+if(!$extConf['hide_by_default'] && isset($extConf['clearCacheCmd']) && count($result)>0) {
+	clearpagecache($extConf['clearCacheCmd']);
 }
 
 unset($newsitem);
