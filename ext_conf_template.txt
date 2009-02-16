@@ -34,7 +34,7 @@ concatenate_text_parts = 0
   # cat=basic; type=int; label=Maximum image size in kb
 max_image_size = 300
 
-  # cat=basic; type=int; label=Maximum image size in kb
+  # cat=basic; type=int; label=Maximum attachment size in kb
 max_attachment_size = 500
 
   # cat=basic; type=string; label=Allowed file extensions for images: Comma separated list of image extensions, like png,jpg,gif. Files with extensions used here will be filtered to news images and will NOT end up at the news file attachments.
