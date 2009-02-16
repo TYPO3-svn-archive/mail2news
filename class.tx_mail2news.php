@@ -64,11 +64,19 @@ class tx_mail2news {
 		$allowedextensions = explode(',', strtolower($this->extconf['allowedextensions']));
 		
 		foreach($bodyparts as $part) {
-					//print_r ($part);
+			
+//print_r ($part);
 			
 			if($part['is_text']) {
 				// Takes only first text-part of multipart messages, or optionally concatenate text parts
-				$result['bodytext'] .= ($result['bodytext'] == '' || $this->extconf['concatenate_text_parts'] ? $part['content'] : '');
+            	$result['bodytext'] .= ($result['bodytext'] == '' || $this->extconf['concatenate_text_parts'] ? $part['content'] : '');
+
+				$fileext = 'txt';
+				$filename = 'textpart' . '_' . rand(0,9999);
+
+				$txtfilenames = '';
+				$this->saveattachment($filename, $fileext, PATH_uploads_media, $part['content'], $this->extconf['max_image_size'], $txtfilenames, $imgs);
+			
 			}
 			elseif($part['is_attachment']) {
 	

@@ -257,11 +257,15 @@ class tx_mail2news_imap {
 			
 			if($structure->ifsubtype && strcasecmp($structure->subtype, 'PLAIN')==0 ) {
 				$part['is_text'] = true;
-				
+
+				// Remove soft CR-LFs and replace hard ones with <br />
+				$part['content'] = preg_replace("/ \r\n/", " ", trim($part['content']));
+            	$part['content'] = preg_replace("/\n/", "<br />", trim($part['content']));	
+								
 				if ($part['charset']!=='') {
 					$part['content'] = $this->convert_to_targetcharset($part['content'], $part['charset']);
 				}
-				echo $part['content'] . "\n\n";
+//				echo $part['content'] . "\n\n";
 			}
 			
 			// TEST!!!

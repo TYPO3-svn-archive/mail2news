@@ -7,18 +7,42 @@ mail_username =
   # cat=basic; type=string; label=Password: Password for POP3 or IMAP mailserver.
 mail_password = 
 
+  # cat=basic; type=boolean; label=Use IMAP or POP3 protocol: Select this box for IMAP, otherwise POP3 will be used to collect email.
+IMAP = 1
+  
+  # cat=basic; type=boolean; label=Mailserver uses SSL: Enable only if your mailserver supports this.
+SSL = 0
+
+  # cat=basic; type=boolean; label=Allow self-signed SSL-certificate: If your mailserver uses a self-signed SSL certificate you can allow this here.
+self_signed_certificate = 0
+  
+  # cat=basic; type=int; label=Port number for mailserver: Leave 0 or empty to use defaults.
+portno = 
+  
   # cat=basic; type=boolean; label=Delete after processing: Delete messages from email account after they are succesfully processed.
-delete_after_download = 0 
+delete_after_download = 0
 
   # cat=basic; type=boolean; label=Also delete rejected messages: Also delete messages that where rejected because of sender not in allowed senders or other reason. Do not use this on a shared email account.
-delete_rejected_mail = 0 
-
-  # cat=basic; type=int; label=Maximum image size in kb
-max_image_size = 300 
+delete_rejected_mail = 0
 
   # cat=basic; type=string; label=Allowed senders: Enter allowed from-email-addresses or part of the email addresses, comma separated. The default allowes all email addresses.
-allowed_senders = @ 
+allowed_senders = @
 
+  # cat=basic; type=boolean; label=Concatenate text parts: In the default setting only the first text part is imported, which skips separate signature parts. Check this box to import and concatenate all text parts of multi-part messages.
+concatenate_text_parts = 0
+
+  # cat=basic; type=int; label=Maximum image size in kb
+max_image_size = 300
+
+  # cat=basic; type=int; label=Maximum image size in kb
+max_attachment_size = 500
+
+  # cat=basic; type=string; label=Allowed file extensions for images: Comma separated list of image extensions, like png,jpg,gif. Files with extensions used here will be filtered to news images and will NOT end up at the news file attachments.
+imageextensions = png,jpg,gif
+  
+  # cat=basic; type=string; label=Allowed extensions other attachments: Comma separated list of file extensions, like pdf,odt,doc, etc.
+allowedextensions = avi,csv,doc,eps,mdb,mp3,mp4,mpg,mov,odt,ods,otf,pdf,pps,ppt,rtf,sxw,sxc,swf,txt,ttf,wks,wpd,wps,xls,xml
+  
   # cat=basic; type=int; label=ttnews category ID: ID of ttnews category for news items created by this extension.
 category_id = 
 
@@ -29,7 +53,7 @@ pid =
 cruser_id = 
 
   # cat=basic; type=boolean; label=Hide new messages: Hide new news items by default, so they will show on the website only after a backend user unhides them.
-hide_by_default = 1 
+hide_by_default = 1
 
   # cat=basic; type=string; label=Clear cache of these pages: Comma separated list of page IDs where the created news records will be shown, of which the cache needs to be cleared for the new items to be shown. 
 clearCacheCmd = 
