@@ -1,3 +1,18 @@
+09-02-16 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 1.9.0 alpha
+	* Completely rewritten, now object oriented code, better structured,
+	maintainable and extendible
+	* Added features:
+	* Now also handles images other than jpg
+	* Attached files other than images are saved to tt_news field NEWS_FILES
+	* Separate max file size settings for images and attachments 
+	* Improved processing of multi-part messages, including nested multi-part
+	* Added character set conversion with separate character set recognition for
+	header and each part of multi-part message
+	* Optionally glues/concatenates all text parts of multipart message together
+	* Extended mail server configuration, POP3/IMAP, SSL option and port setting
+
 08-10-06
 
 	* Version 1.1.0 beta

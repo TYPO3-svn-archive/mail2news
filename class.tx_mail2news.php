@@ -52,6 +52,7 @@ class tx_mail2news {
 	 */
 		
 	function storebodyparts($bodyparts) {
+		
 		$result = array(
 			'bodytext' => '',
 			'imagefilenames' => '',
@@ -65,18 +66,11 @@ class tx_mail2news {
 		
 		foreach($bodyparts as $part) {
 			
-//print_r ($part);
-			
 			if($part['is_text']) {
+
 				// Takes only first text-part of multipart messages, or optionally concatenate text parts
             	$result['bodytext'] .= ($result['bodytext'] == '' || $this->extconf['concatenate_text_parts'] ? $part['content'] : '');
 
-				$fileext = 'txt';
-				$filename = 'textpart' . '_' . rand(0,9999);
-
-				$txtfilenames = '';
-				$this->saveattachment($filename, $fileext, PATH_uploads_media, $part['content'], $this->extconf['max_image_size'], $txtfilenames, $imgs);
-			
 			}
 			elseif($part['is_attachment']) {
 	
@@ -94,12 +88,17 @@ class tx_mail2news {
 				elseif ($fileext !== '' && in_array($fileext, $allowedextensions)) {
 					$this->saveattachment($filename, $fileext, PATH_uploads_media, $part['content'], $this->extconf['max_attachment_size'], $result['attachmentfilenames'], $atts);
 				}
+				
 			}
 		}
 		return $result;
 	}
 	
+	/*
+	 * 	Save attachment in $savepath and append filename to (referenced) $filelist variable, increment ref $counter
+	 */
 	function saveattachment($filename, $fileext, $savepath, $attachment, $maxsize, &$filelist, &$counter) {
+		
 		if(strlen($attachment)<=$maxsize*1024) {
 			$filename .= '_' . strval($counter+1) . '.' . $fileext;
 			if (! $handle = @fopen($savepath . $filename, "w")) {
@@ -111,6 +110,7 @@ class tx_mail2news {
 			$filelist .= ($filelist=='' ? '' : ',') . $filename;
 			$counter++;
 		}
+	
 	}
 
 }

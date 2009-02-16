@@ -5,12 +5,6 @@ class tx_mail2news_imap {
 	protected $mail;
 	var $targetcharset;
 
-	// message header data
-	//protected $msgno;
-	protected $date;
-	//protected $charset;
-	//protected $multipart;
-	
 	// message body data
 	protected $parts;
 	protected $partno;
@@ -41,20 +35,23 @@ class tx_mail2news_imap {
 		
 		$mailboxoptions = ':' . $portno . ($options['IMAP'] ? '/imap' : '/pop3') . ($options['SSL'] ? '/ssl' : '') . ($options['self_signed_certificate'] ? '/novalidate-cert' : '') . '/notls';
 		
-		//echo 'Opening IMAP, using $mailboxoptions = ' . $mailboxoptions . "\n";
 		if (! $this->mail = imap_open( '{' . $mail_server . $mailboxoptions . '}INBOX', $mail_username, $mail_password)) {
 			die('Could not connect to mailserver. Quitting...' . "\n");
 		}
 	}
 	
+	/*
+	 * 	Returns the number of messages in inbox
+	 */
 	function imap_count_headers() {
 		return count(imap_headers($this->mail));
 	}
 
-	function imap_delete_current_message($msgno) {
+	/*
+	 * 	Delete message $msgno
+	 */
+	function imap_delete_message($msgno) {
 		imap_delete($this->mail, $msgno);
-
-		//echo "IMAP deleted nr: " . $msgno . "\n";
 	}
 
 	function imap_disconnect () {
@@ -62,16 +59,19 @@ class tx_mail2news_imap {
 		imap_expunge($this->mail);
 		// close connection
 		imap_close($this->mail);
-		
-		//echo "IMAP closed\n";
 	}
 
+	/*
+	 * 	Sets the target character set to which appropriate text and header fields will be converted
+	 */
 	function set_targetcharset($charset) {
 		$this->targetcharset = $charset;
-
-		//echo "IMAP target charset set to $charset \n";
 	}
 
+	/*
+	 * 	Checks if charset is different from target charset, if so, convert
+	 * 	windows-1252 is treated as ISO-8859-1, default as US-ASCII
+	 */
 	function convert_to_targetcharset($string, $currentcharset) {
 		if (strcasecmp($currentcharset, 'windows-1252') == 0) {
 			$currentcharset = 'ISO-8859-1';
@@ -86,51 +86,37 @@ class tx_mail2news_imap {
 	}
 
 
+	/*
+	 * 	Fetch header of message $msgno and return header fields:
+	 * 	If charset is defined in header, the fields from name and subject are
+	 * 	converted to target charset.
+	 * 	Input:	$msgno
+	 * 	Output:	$header Array
+	 * 		fromemail => from: email address,
+	 * 		fromname => from: full name, 
+	 * 		date	=> unix timestamp,
+	 * 		subject	=> message subject
+	 * 	
+	 */
 	function imap_get_message_header($msgno) {
 
 		$header = Array();
-	/*
-		preg_match("/[0-9]/", $headerstring, $number);
-		$this->msgno = $number[0];
-	*/
+
 		// parse message and sender
 		$headertext = imap_fetchheader($this->mail, $msgno);
-		
-	//echo "$headertext\n\n";
-		/*
-		$header['charset'] = $this->charset = '';
-		//$header['multipart'] = $this->multipart = FALSE;
-		if (preg_match("/Content-Type: text\/plain; charset=(.*)?;/", $headertext, $charset)) {
-			$header['charset'] = $this->charset = $charset[1];
-		} elseif (preg_match("/Content-Type: multipart\/(.*);/", $headertext)) {
-			$header['multipart'] = $this->multipart = TRUE;
-		}
-		*/
 		$headerinfo = imap_headerinfo($this->mail, $msgno, 256, 256);
-	//var_dump(get_object_vars($headerinfo));
 		
-		// Extract message from_email
+		// Extract from_email
 		$from = $headerinfo->from[0];
 		$header['fromemail'] = $from->mailbox . '@' . $from->host;
-		// Extract message from_name
+		// Extract from_name
 		$decode = imap_mime_header_decode($from->personal);
 		$header['fromname'] = $this->convert_to_targetcharset($decode[0]->text, $decode[0]->charset);
 
 		// Extract message date and translate to unix timestamp
-		/*
-		preg_match("/Date: (.*)?[\+|-]/", $headertext, $date);
-		$this->date = strtotime(htmlentities($date[1]));
-		$header['date'] = $this->date;
-		*/
-		// Alt:
 		$decode = imap_mime_header_decode($headerinfo->udate);
 		$header['date'] = $decode[0]->text;
 
-		/*
-		// LH: remove following old lines, as it takes only part of the subject until first non-ascii char
-		$decode = imap_mime_header_decode($headerinfo->fetchsubject);
-		$infofetchsubject = $decode[0]->text;
-		*/
 		$decode = imap_mime_header_decode($headerinfo->subject);
 		if (isset($decode[1])) {
 			$header['subject'] = $this->convert_to_targetcharset($decode[1]->text, $decode[1]->charset);
@@ -138,37 +124,9 @@ class tx_mail2news_imap {
 			// No charset defined in header
 			$header['subject'] = $decode[0]->text;
 			// Sets charset to 'default'.....
-			$header['charset'] = $decode[0]->charset;
+			//$header['charset'] = $decode[0]->charset;
 		}
 		
-		$header['unseen'] = $headerinfo->Unseen;
-		$header['recent'] = $headerinfo->Recent;
-		//$header['charset'] = $decode[1]->charset;
-		
-		// Extract mail subject
-		//preg_match("/Subject: (.*)\n/", $headertext, $subject_array);
-		//$header['subject'] = $subject_array[1];
-		//echo "INFOSUBJECT: " . $infosubject . "\n";
-		
-		//$decode = imap_mime_header_decode($headerinfo->from[0]->personal);
-		/*
-		//echo $headertext;
-		//echo "\n" . "CHARSET[0]: " . $charset[0] . "\n";
-		echo "\n" . "CHARSET[1]: " . $header['charset'] . "\n";
-		echo "INFOSUBJECT: " . $infosubject . "\n";
-		echo "SUBJECT: " . $this->subject . "\n";
-		echo "CONV_SUBJECT: " . mb_convert_encoding($header['subject'], $this->targetcharset, $header['charset']) . "\n";
-		echo "AUTO_SUBJECT: " . mb_convert_encoding($header['subject'], $this->targetcharset, auto) . "\n\n";
-		echo "FROM_NAME: " . $from_name . "\n";
-		echo "CONV_FROM: " . mb_convert_encoding($header['fromname'], $this->targetcharset, $header['charset']) . "\n";
-		echo "AUTO_FROM: " . mb_convert_encoding($header['fromname'], $this->targetcharset, auto) . "\n\n";
-		echo "DATE: " . $header['date'] . "\n";
-		echo "UDATE: " . $udate . "\n\n";
-
-		foreach($header as $key=>$item) {
-			echo '$header['. $key . '] = ' . $item . "\n";
-		}
-		*/
 		return $header;
 		
 	}
@@ -176,9 +134,6 @@ class tx_mail2news_imap {
 	function imap_get_message_body($msgno) {
 		
 		$structure = imap_fetchstructure($this->mail, $msgno);
-	
-//	print_r(get_object_vars($structure));
-//	reset($structure);
 	
 		$this->parts = array();
 		$this->partno = 0;
@@ -203,12 +158,6 @@ class tx_mail2news_imap {
 			
 			if($imappart=='') $imappart = '1';
 			$partbody = imap_fetchbody($this->mail, $msgno, $imappart);	//	$this->partno+1);
-			
-			/*
-			echo "################### Part no: ".$imappart." ##################\n";
-			print_r(get_object_vars($structure));
-			reset($structure);
-			*/
 			
 			$part = array(
 				'is_text' => false,
@@ -252,7 +201,6 @@ class tx_mail2news_imap {
 	
 			if($structure->ifsubtype && strcasecmp($structure->subtype, 'HTML')==0 ) {
 				// No support for html-mail (yet?)
-				//echo "\nThere you have it! HTML! is_text = " . ($part['is_text']?'true':'false') . " | is_attach = " .($part['is_attachment']?'true':'false'). "\n\n";
 			}	
 			
 			if($structure->ifsubtype && strcasecmp($structure->subtype, 'PLAIN')==0 ) {
@@ -265,11 +213,7 @@ class tx_mail2news_imap {
 				if ($part['charset']!=='') {
 					$part['content'] = $this->convert_to_targetcharset($part['content'], $part['charset']);
 				}
-//				echo $part['content'] . "\n\n";
 			}
-			
-			// TEST!!!
-			//$part['content'] = substr($part['content'], 0, 20);
 			
 			// Skip unknown parts
 			if ($part['is_text'] || $part['is_attachment']) {

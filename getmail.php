@@ -59,14 +59,7 @@ if(isset($TYPO3_CONF_VARS['BE']['forceCharset']) && $TYPO3_CONF_VARS['BE']['forc
 	// if not set, use default TYPO3 charset
 	$imap->set_targetcharset('ISO-8859-1');
 }
-/*
-$options = Array(
-	'IMAP' => $extConf['IMAP'],
-	'SSL' => $extConf['SSL'],
-	'portno' => $extConf['portno'],
-	'self_signed_certificate' => $extConf['self_signed_certificate']
-);
-*/
+
 $imap->imap_connect($extConf['mail_server'], $extConf['mail_username'], $extConf['mail_password'], $extConf);
 
 $itemadded = FALSE;
@@ -79,33 +72,11 @@ for ($msgno = 1; $msgno <= $count; $msgno++) {
 
 	if ($main->matchemail($extConf['allowed_senders'], $header['fromemail'])) {
 
-		/*
-		echo "--------------------------------------------------------------------------\n";
-		foreach($header as $key=>$item) {
-			echo '$header['. $key . '] = ' . $item . "\n";
-		}
-		echo "SUBJECT: " . $header['subject'];
-		echo "\n";
-		*/
-
 		$bodyparts = $imap->imap_get_message_body($msgno);
 		
 		$body = $main->storebodyparts($bodyparts);
 		
-		//print_r($body);
-		
 		$msg = array_merge($header, $body);
-
-		/*
-		foreach($body as $key=>$item) {
-			if($key!='bodytext') echo '$body['. $key . '] = ' . $item . "\n";
-		}
-		echo "\n";
-		foreach($msg as $key=>$item) {
-			echo '$msg['. $key . '] = ' . $item . "\n";
-		}
-		echo "\n";
-		*/
 
 		// Map email array to newsitem array
 		$newsitem = Array();
@@ -129,21 +100,19 @@ for ($msgno = 1; $msgno <= $count; $msgno++) {
 		//$msg['category'];
 
 		$news->store_news($newsitem);
-		// echo actions for logfile
+		// echo actions for cron log file
 		echo date("Y-m-d H:i:s ") . 'News item created: "' . $newsitem["title"] . '", ' . $newsitem["author"] . "\n";
 		$itemadded = TRUE;
 		
 		// mark emails for deletion from server
 		if ($extConf['delete_after_download']) {
-			$imap->imap_delete_current_message();
+			$imap->imap_delete_message($msgno);
 		}
 	}
 	elseif ($extConf['delete_rejected_mail']) {
-		$imap->imap_delete_current_message();
+		$imap->imap_delete_message($msgno);
 	}
-	else {
-		echo "email doesnt match enzo.\n";
-	}
+
 }
 
 // delete all read emails from server and close connection
@@ -152,8 +121,6 @@ $imap->imap_disconnect();
 // Clear page cache for pages set in extConf, if new records are not hidden
 if(!$extConf['hide_by_default'] && isset($extConf['clearCacheCmd']) && $itemadded) {
 	$main->clearpagecache($extConf['clearCacheCmd']);
-	
-	//echo "cache cleared for " . $extConf['clearCacheCmd'] . "\n";
 }
 
 unset($header,$body,$msg,$newsitem,$TYPO3_CONF_VARS,$TYPO3_DB);

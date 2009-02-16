@@ -31,22 +31,6 @@ class tx_mail2news_ttnews {
 		$newsitem['cruser_id'] = $this->extconf['cruser_id'];
 		$newsitem['tstamp'] = $newsitem['crdate'] = time();
 
-		/*	
-		// encode everything with UTF-8 if set in localconf.php
-		if($TYPO3_CONF_VARS['BE']['forceCharset'] == 'utf-8'){
-			foreach($newsitem as $field => $value){
-				$newsitem[$field] = utf8_encode($value);
-			}
-		}
-		*/
-		
-		/*
-		foreach($newsitem as $key=>$item) {
-			echo '$newsitem['. $key . '] = ' . $item . "\n";
-		}
-		echo "\n";
-		*/
-		
 		$TYPO3_DB->exec_INSERTquery('tt_news',$newsitem);
 		
 		// Set category in table tt_news_cat_mm with UID of new record
