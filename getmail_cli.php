@@ -1,4 +1,5 @@
 <?php
+//#!/usr/bin/php
 
 /***************************************************************
 *  Copyright notice
@@ -37,54 +38,13 @@
  * [CLASS/FUNCTION INDEX of SCRIPT]
  */
 
-class tx_mail2news_ttnews {
+include('init.php');
+include('class.tx_mail2news_getmail.php');
 
-	public $extconf;
+//require_once(t3lib_extMgm::extPath('mail2news').'class.tx_mail2news_getmail.php');
 
-	/*
-	*	Construct new object
-	*/
-	/*
-	function __construct() {
-	}
-	*/
+$class = t3lib_div::makeInstanceClassName('tx_mail2news_getmail');
+$main = new $class(unserialize($TYPO3_CONF_VARS['EXT']['extConf']['mail2news']));
+$main->getmail();
 
-	function store_news($newsitem, $folderpid, $hide) {
-	
-		global $TYPO3_DB;
-
-		// supply additional fields from configuration defaults
-		$newsitem['pid'] = $folderpid;
-		$newsitem['hidden'] = $hide;
-		// Set category for this record?
-		$addCat = isset($newsitem['category']);
-		// tt_news field category in table tt_news contains no of categories
-		if ($addCat) {
-			$category_id = $newsitem['category'];
-			$newsitem['category'] = 1;
-		} else {
-			$newsitem['category'] = 0;
-		}
-		//$newsitem['cruser_id'] = $this->extconf['cruser_id'];
-		$newsitem['tstamp'] = $newsitem['crdate'] = time();
-
-		$TYPO3_DB->exec_INSERTquery('tt_news',$newsitem);
-		
-		// Set category in table tt_news_cat_mm with UID of new record
-		if ($addCat) {
-			$catmm = array(
-				'uid_local' => $TYPO3_DB->sql_insert_id(),
-				'uid_foreign' => $category_id,
-				'sorting' => 1,
-				//'tablenames' => ''
-			);
-			$TYPO3_DB->exec_INSERTquery('tt_news_cat_mm',$catmm);
-		}
-		
-	}
-}
-
-if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/mail2news/class.tx_mail2news_ttnews.php']) {
-	include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/mail2news/class.tx_mail2news_ttnews.php']);
-}
 ?>
