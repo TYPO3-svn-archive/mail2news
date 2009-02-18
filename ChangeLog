@@ -1,3 +1,9 @@
+09-02-18 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 1.9.1 alpha
+	* Cron script now uses TYPO3's cli_dispatch script to execute the cronjob in
+	the context of TYPO3
+
 09-02-16 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
 	* Version 1.9.0 alpha

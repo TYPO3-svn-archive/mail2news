@@ -1,6 +1,7 @@
 <?php
 
 ini_set('error_reporting', E_ERROR | E_WARNING | E_PARSE | E_NOTICE);
+//ini_set('error_reporting', E_ALL ^ E_NOTICE);
 
 // Stop script if someone tries to access it through HTTP
 if(isset($_SERVER)) {
