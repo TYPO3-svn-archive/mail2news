@@ -53,9 +53,6 @@ class tx_mail2news_ttnews {
 	
 		global $TYPO3_DB;
 
-		// supply additional fields from configuration defaults
-		$newsitem['pid'] = $folderpid;
-		$newsitem['hidden'] = $hide;
 		// Set category for this record?
 		$addCat = isset($newsitem['category']);
 		// tt_news field category in table tt_news contains no of categories
@@ -65,7 +62,6 @@ class tx_mail2news_ttnews {
 		} else {
 			$newsitem['category'] = 0;
 		}
-		//$newsitem['cruser_id'] = $this->extconf['cruser_id'];
 		$newsitem['tstamp'] = $newsitem['crdate'] = time();
 
 		$TYPO3_DB->exec_INSERTquery('tt_news',$newsitem);

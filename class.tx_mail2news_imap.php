@@ -113,7 +113,7 @@ class tx_mail2news_imap {
 		if (strcasecmp($currentcharset, 'windows-1252') == 0) {
 			$currentcharset = 'ISO-8859-1';
 		}
-		if (strcasecmp($currentcharset, 'default') == 0) {
+		if (strcasecmp($currentcharset, 'default') == 0 || $currentcharset == '') {
 			$currentcharset = 'US-ASCII';
 		}
 		if (strcasecmp($currentcharset, $this->targetcharset) <> 0) {
@@ -149,6 +149,7 @@ class tx_mail2news_imap {
 		// Extract from_name
 		$decode = imap_mime_header_decode($from->personal);
 		$header['fromname'] = $this->convert_to_targetcharset($decode[0]->text, $decode[0]->charset);
+		//$header['charset'] = $decode[0]->charset;
 
 		// Extract message date and translate to unix timestamp
 		$decode = imap_mime_header_decode($headerinfo->udate);
@@ -158,14 +159,13 @@ class tx_mail2news_imap {
 		if (isset($decode[1])) {
 			$header['subject'] = $this->convert_to_targetcharset($decode[1]->text, $decode[1]->charset);
 		} else {
-			// No charset defined in header
-			$header['subject'] = $decode[0]->text;
-			// Sets charset to 'default'.....
-			//$header['charset'] = $decode[0]->charset;
+			// Not sure why [1] is not always defined, but it works this way
+			//$header['subject'] = $decode[0]->text;
+			$header['subject'] = $this->convert_to_targetcharset($decode[0]->text, $decode[0]->charset);
 		}
 		
 		return $header;
-		
+				
 	}
 
 	function imap_get_message_body($msgno) {

@@ -97,7 +97,12 @@ class tx_mail2news_getmail extends t3lib_cli {
 		
 				//$msg['category'];
 
-				$news->store_news($newsitem, $extConf['pid'], $extConf['hide_by_default']);
+				// supply additional fields from configuration defaults
+				$newsitem['pid'] = $extConf['pid'];
+				$newsitem['hidden'] = $extConf['hide_by_default'];
+				$newsitem['cruser_id'] = $extConf['cruser_id'];
+				
+				$news->store_news($newsitem);
 				// echo actions for cron log file
 				echo date("Y-m-d H:i:s ") . 'News item created: "' . $newsitem["title"] . '", ' . $newsitem["author"] . "\n";
 				$itemadded = TRUE;
