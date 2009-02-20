@@ -1,2 +1,3 @@
 
-Feel free to add some documentation or simply add a link to the online manual.
+See the manual.sxw included in this extension, or check the manual online:
+http://typo3.org/documentation/document-library/extension-manuals/mail2news/
