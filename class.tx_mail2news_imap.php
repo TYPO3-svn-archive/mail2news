@@ -73,7 +73,7 @@ class tx_mail2news_imap {
 		$mailboxoptions = ':' . $portno . ($options['IMAP'] ? '/imap' : '/pop3') . ($options['SSL'] ? '/ssl' : '') . ($options['self_signed_certificate'] ? '/novalidate-cert' : '') . '/notls';
 		
 		if (! $this->mail = imap_open( '{' . $mail_server . $mailboxoptions . '}INBOX', $mail_username, $mail_password)) {
-			die('Could not connect to mailserver. Quitting...' . "\n");
+			die(date("Y-m-d H:i:s ") . 'Could not connect to mailserver. Quitting...' . "\n");
 		}
 	}
 	
@@ -242,11 +242,9 @@ class tx_mail2news_imap {
 			
 			if($structure->ifsubtype && strcasecmp($structure->subtype, 'PLAIN')==0 ) {
 				$part['is_text'] = true;
-
-				// Remove soft CR-LFs and replace hard ones with <br />
+				// Remove soft CR-LFs (preg_replace)
 				$part['content'] = preg_replace("/ \r\n/", " ", trim($part['content']));
-            	$part['content'] = preg_replace("/\n/", "<br />", trim($part['content']));	
-								
+				
 				if ($part['charset']!=='') {
 					$part['content'] = $this->convert_to_targetcharset($part['content'], $part['charset']);
 				}

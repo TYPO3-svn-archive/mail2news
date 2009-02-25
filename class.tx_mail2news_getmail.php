@@ -85,26 +85,44 @@ class tx_mail2news_getmail extends t3lib_cli {
 				//$newsitem['datetime'] = time();
 				
 				$newsitem['title'] = $msg['subject'];
-				//$newsitem['subheader'] = $msg['subheader'];
-				$newsitem['bodytext'] = $msg['bodytext'];
+								
+				
+				// Read category selector and subheader, if present, from message body text 
+				$bodytext = explode("\r\n",$msg['bodytext']);
+				$category = FALSE;
+				$subheader = FALSE;
+				for ($i = 1; $i <= 2; $i++) {
+					if (!$category) $category = $this->getparameterline($bodytext,$extConf['category_identifier']);
+					if (!$subheader) $subheader = $this->getparameterline($bodytext,$extConf['subheader_identifier']);
+				}
+				// implode what's left of bodytext and add <br /> tag while we're at it
+				$newsitem['bodytext'] = implode("<br />\r\n", $bodytext);
+				$newsitem['short'] = $subheader;
+				
 				$newsitem['author_email'] = $msg['fromemail'];
 				$newsitem['image'] = $msg['imagefilenames'];
 				$newsitem['news_files'] = $msg['attachmentfilenames'];
-		
-				if (isset($extConf['category_id'])) {
-					$newsitem['category'] = $extConf['category_id'];
-				}
-		
-				//$msg['category'];
 
 				// supply additional fields from configuration defaults
 				$newsitem['pid'] = $extConf['pid'];
 				$newsitem['hidden'] = $extConf['hide_by_default'];
 				$newsitem['cruser_id'] = $extConf['cruser_id'];
 				
+				// Check news category: first check if category from message is valid,
+				// if not, check default category from em config.
+				if ($category) $category = $news->category_id($category);
+				
+				if (!$category) {
+					if (isset($extConf['default_category'])) {
+						$category = $news->category_id($extConf['default_category']);
+					}
+				}
+				// Set news category only if a valid category has been found
+				if ($category) $newsitem['category'] = $category;
+				
 				$news->store_news($newsitem);
 				// echo actions for cron log file
-				echo date("Y-m-d H:i:s ") . 'News item created: "' . $newsitem["title"] . '", ' . $newsitem["author"] . "\n";
+				echo date("Y-m-d H:i:s ") . 'News item created: [cat ' . $category . '] "' . $newsitem["title"] . '", ' . $newsitem["author"] . "\n";
 				$itemadded = TRUE;
 				
 				// mark emails for deletion from server
@@ -129,6 +147,17 @@ class tx_mail2news_getmail extends t3lib_cli {
 		unset($header,$body,$msg,$newsitem,$TYPO3_CONF_VARS,$TYPO3_DB);
 		
 	}
+	
+	function getparameterline(&$text,$label) {
+		if (strlen($label) > 0 && isset($text[0])) {
+			if (preg_match("/^" . quotemeta($label) . "(.*)?$/", $text[0], $match)) {
+				array_shift($text);
+				return trim($match[1]);
+			}
+		}
+		return FALSE;
+	}
+							
 	/*
 	 * 	Check if $email matches one of the allowed email address parts $match
 	 * 	Input:	$match (str)	comma separated parts of emailaddress,
@@ -223,7 +252,7 @@ class tx_mail2news_getmail extends t3lib_cli {
 		if(strlen($attachment)<=$maxsize*1024) {
 			$filename .= '_' . strval($counter+1) . '.' . $fileext;
 			if (! $handle = @fopen($savepath . $filename, "w")) {
-				die("No permission to write file, quitting ... \n");		// TODO: more subtle exception here
+				die(date("Y-m-d H:i:s ") . "No permission to write file, quitting ... \n");		// TODO: more subtle exception here
 			}
 			fwrite($handle, $attachment);
 			fclose($handle);

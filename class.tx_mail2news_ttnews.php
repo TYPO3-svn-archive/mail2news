@@ -49,7 +49,29 @@ class tx_mail2news_ttnews {
 	}
 	*/
 
-	function store_news($newsitem, $folderpid, $hide) {
+	/*
+	 * 	Check if tt_news category exists.
+	 * 	First checks is $category is category-title, if not, checks if it matches uid.
+	 * 	Input: string or integer $category, can be name or uid
+	 * 	Output: string category-uid, FALSE if no matching category
+	 */
+	function category_id($category) {
+		global $TYPO3_DB;
+		$rows = $TYPO3_DB->exec_SELECTgetRows('uid,title', 'tt_news_cat', 'title = "'.$category. '"');
+		if (count($rows) == 1) {
+			$uid = $rows[0]['uid'];
+		} else {
+			$rows = $TYPO3_DB->exec_SELECTgetRows('uid', 'tt_news_cat', 'uid = '.$category);
+			if (count($rows) == 1) {
+				$uid = $category;
+			} else {
+				$uid = FALSE;
+			}
+		}
+		return $uid;
+	}
+
+	function store_news($newsitem) {
 	
 		global $TYPO3_DB;
 
