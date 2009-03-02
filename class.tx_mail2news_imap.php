@@ -155,14 +155,14 @@ class tx_mail2news_imap {
 		$decode = imap_mime_header_decode($headerinfo->udate);
 		$header['date'] = $decode[0]->text;
 
+		// decode multi-line message subject
+		$header['subject'] = '';
 		$decode = imap_mime_header_decode($headerinfo->subject);
-		if (isset($decode[1])) {
-			$header['subject'] = $this->convert_to_targetcharset($decode[1]->text, $decode[1]->charset);
-		} else {
-			// Not sure why [1] is not always defined, but it works this way
-			//$header['subject'] = $decode[0]->text;
-			$header['subject'] = $this->convert_to_targetcharset($decode[0]->text, $decode[0]->charset);
+		foreach($decode as $subjectline) {
+			$header['subject'] .= $this->convert_to_targetcharset($subjectline->text, $subjectline->charset);
 		}
+		// remove tabs from multi-line format
+		$header['subject'] = preg_replace("/\t/", "", $header['subject']);
 		
 		return $header;
 				
