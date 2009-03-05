@@ -122,7 +122,19 @@ class tx_mail2news_imap {
 		return $string;
 	}
 
-
+	/*
+	 *  Decode multi-line mime-header item, get charset and convert if necessary
+	 */
+	function decode_header_item($item) {
+		$result = '';
+		$decode = imap_mime_header_decode($item);
+		foreach($decode as $line) {
+			$result .= $this->convert_to_targetcharset($line->text, $line->charset);
+		}
+		// remove tabs from multi-line format
+		return preg_replace("/\t/", "", $result);
+	}
+	
 	/*
 	 * 	Fetch header of message $msgno and return header fields:
 	 * 	If charset is defined in header, the fields from name and subject are
@@ -147,22 +159,14 @@ class tx_mail2news_imap {
 		$from = $headerinfo->from[0];
 		$header['fromemail'] = $from->mailbox . '@' . $from->host;
 		// Extract from_name
-		$decode = imap_mime_header_decode($from->personal);
-		$header['fromname'] = $this->convert_to_targetcharset($decode[0]->text, $decode[0]->charset);
-		//$header['charset'] = $decode[0]->charset;
+		$header['fromname'] = $this->decode_header_item($from->personal);
 
 		// Extract message date and translate to unix timestamp
 		$decode = imap_mime_header_decode($headerinfo->udate);
 		$header['date'] = $decode[0]->text;
 
 		// decode multi-line message subject
-		$header['subject'] = '';
-		$decode = imap_mime_header_decode($headerinfo->subject);
-		foreach($decode as $subjectline) {
-			$header['subject'] .= $this->convert_to_targetcharset($subjectline->text, $subjectline->charset);
-		}
-		// remove tabs from multi-line format
-		$header['subject'] = preg_replace("/\t/", "", $header['subject']);
+		$header['subject'] = $this->decode_header_item($headerinfo->subject);
 		
 		return $header;
 				
@@ -209,7 +213,10 @@ class tx_mail2news_imap {
 				foreach($structure->dparameters as $object) {
 					if(strcasecmp($object->attribute, 'filename') == 0) {
 						$part['is_attachment'] = true;
-						$part['filename'] = $object->value;
+						$part['filename'] = $this->decode_header_item($object->value);
+						
+						echo $object->value . "\n";
+						echo $part['filename'] . "\n";
 					}
 				}
 			}
@@ -218,7 +225,7 @@ class tx_mail2news_imap {
 				foreach($structure->parameters as $object) {
 					if(strcasecmp($object->attribute, 'name') == 0) {
 						$part['is_attachment'] = true;
-						$part['name'] = $object->value;
+						$part['name'] = $this->decode_header_item($object->value);
 					}
 					if(strcasecmp($object->attribute, 'charset') == 0) {
 						$part['charset'] = $object->value;
