@@ -1,3 +1,9 @@
+09-03-06 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 1.9.4 beta
+	* Added MIME-header decoding and character set decoding/encoding for
+	image and attachment filenames
+
 09-02-25 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
 	* Version 1.9.3 beta

@@ -214,9 +214,6 @@ class tx_mail2news_imap {
 					if(strcasecmp($object->attribute, 'filename') == 0) {
 						$part['is_attachment'] = true;
 						$part['filename'] = $this->decode_header_item($object->value);
-						
-						echo $object->value . "\n";
-						echo $part['filename'] . "\n";
 					}
 				}
 			}
@@ -229,8 +226,7 @@ class tx_mail2news_imap {
 					}
 					if(strcasecmp($object->attribute, 'charset') == 0) {
 						$part['charset'] = $object->value;
-					}
-					
+					}	
 				}
 			}
 			if($structure->encoding == ENCBASE64) { // 3 = BASE64
@@ -251,10 +247,7 @@ class tx_mail2news_imap {
 				$part['is_text'] = true;
 				// Remove soft CR-LFs (preg_replace)
 				$part['content'] = preg_replace("/ \r\n/", " ", trim($part['content']));
-				
-				if ($part['charset']!=='') {
-					$part['content'] = $this->convert_to_targetcharset($part['content'], $part['charset']);
-				}
+				$part['content'] = $this->convert_to_targetcharset($part['content'], $part['charset']);
 			}
 			
 			// Skip unknown parts

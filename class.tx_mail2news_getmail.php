@@ -76,17 +76,6 @@ class tx_mail2news_getmail extends t3lib_cli {
 				$body = $this->storebodyparts($bodyparts);
 				$msg = array_merge($header, $body);
 		
-				// Map email array to newsitem array
-				$newsitem = Array();
-				$newsitem['author'] = $msg['fromname'];
-				$newsitem['datetime'] = $msg['date'];
-				
-				// FOR TESTING:
-				//$newsitem['datetime'] = time();
-				
-				$newsitem['title'] = $msg['subject'];
-								
-				
 				// Read category selector and subheader, if present, from message body text 
 				$bodytext = explode("\r\n",$msg['bodytext']);
 				$category = FALSE;
@@ -95,14 +84,24 @@ class tx_mail2news_getmail extends t3lib_cli {
 					if (!$category) $category = $this->getparameterline($bodytext,$extConf['category_identifier']);
 					if (!$subheader) $subheader = $this->getparameterline($bodytext,$extConf['subheader_identifier']);
 				}
+
+				// Map email msg array to newsitem array
+				$newsitem = Array();
 				// implode what's left of bodytext and add <br /> tag while we're at it
 				$newsitem['bodytext'] = implode("<br />\r\n", $bodytext);
-				$newsitem['short'] = $subheader;
-				
-				$newsitem['author_email'] = $msg['fromemail'];
+				$newsitem['short'] = $subheader;			
 				$newsitem['image'] = $msg['imagefilenames'];
 				$newsitem['news_files'] = $msg['attachmentfilenames'];
-
+				$newsitem['author'] = $msg['fromname'];
+				$newsitem['title'] = $msg['subject'];
+				
+				// newsitem fields below do not need to be encoded
+				$newsitem['author_email'] = $msg['fromemail'];
+				$newsitem['datetime'] = $msg['date'];
+				
+				// FOR TESTING:
+				//$newsitem['datetime'] = time();
+				
 				// supply additional fields from configuration defaults
 				$newsitem['pid'] = $extConf['pid'];
 				$newsitem['hidden'] = $extConf['hide_by_default'];
