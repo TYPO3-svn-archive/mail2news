@@ -1,3 +1,13 @@
+10-04-29 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Fixed bug characterset conversion on a UTF-8 TYPO3 setup:
+	http://forge.typo3.org/issues/show/6678
+	* Applied source formatting and improved code comments using extdeveval
+
+10-04-23 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Added file ext_localconf.php with automatic cli_key registration
+	
 09-03-06 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
 	* Version 1.9.4 beta
