@@ -75,13 +75,14 @@
 			// new objects
 			$imap = t3lib_div::makeInstance('tx_mail2news_imap');
 			$news = t3lib_div::makeInstance('tx_mail2news_ttnews');
-			 
+			
+			// Use default charset if nothing configured
+			$this->targetcharset = 'iso-8859-1';
 			if (isset($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset']) && $GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset'] <> '') {
-				$imap->set_targetcharset(strtoupper($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset']));
-			} else {
-				// if not set, use default TYPO3 charset
-				$imap->set_targetcharset('ISO-8859-1');
+				$this->targetcharset = strtolower($GLOBALS['TYPO3_CONF_VARS']['BE']['forceCharset']);
 			}
+			$imap->set_targetcharset($this->targetcharset);
+
 			$imap->imap_connect($extConf['mail_server'], $extConf['mail_username'], $extConf['mail_password'], $extConf);
 			$itemadded = FALSE;
 			$count = $imap->imap_count_headers($imap);
@@ -94,42 +95,50 @@
 					$bodyparts = $imap->imap_get_message_body($msgno);
 					$body = $this->storebodyparts($bodyparts);
 					$msg = array_merge($header, $body);
-					 
+					
 					// Read category selector and subheader, if present, from message body text
 					$bodytext = explode("\r\n", $msg['bodytext']);
 					$category = FALSE;
 					$subheader = FALSE;
 					for ($i = 1; $i <= 2; $i++) {
-						if (!$category) $category = $this->getparameterline($bodytext, $extConf['category_identifier']);
-							if (!$subheader) $subheader = $this->getparameterline($bodytext, $extConf['subheader_identifier']);
+						if (!$category) {
+							$category = $this->getparameterline($bodytext, $extConf['category_identifier']);
 						}
-					 
+						if (!$subheader) {
+							$subheader = $this->getparameterline($bodytext, $extConf['subheader_identifier']);
+						}
+					}
+					
 					// Map email msg array to newsitem array
 					$newsitem = Array();
-					// implode what's left of bodytext and add <br /> tag while we're at it
-					$newsitem['bodytext'] = implode("<br />\r\n", $bodytext);
+					// Implode what's left of bodytext, add <br /> at end of lines and
+					// wrap the text in p-tags while we're at it
+					$newsitem['bodytext'] = '<p>' . implode("<br />", $bodytext) . '</p>';
+					// Replace double line breaks with p-tags, and remove empty space in between (spc, nbsp or tab)
+					$newsitem['bodytext'] = preg_replace('/<br \/>(\ |\t|&nbsp;)*<br \/>/', '</p><p>', $newsitem['bodytext']);
+
 					$newsitem['short'] = $subheader;
 					$newsitem['image'] = $msg['imagefilenames'];
 					$newsitem['news_files'] = $msg['attachmentfilenames'];
 					$newsitem['author'] = $msg['fromname'];
 					$newsitem['title'] = $msg['subject'];
-					 
+
 					// newsitem fields below do not need to be encoded
 					$newsitem['author_email'] = $msg['fromemail'];
 					$newsitem['datetime'] = $msg['date'];
-					 
+					
 					// FOR TESTING:
 					//$newsitem['datetime'] = time();
-					 
+					
 					// supply additional fields from configuration defaults
 					$newsitem['pid'] = $extConf['pid'];
 					$newsitem['hidden'] = $extConf['hide_by_default'];
 					$newsitem['cruser_id'] = $extConf['cruser_id'];
-					 
+					
 					// Check news category: first check if category from message is valid,
 					// if not, check default category from em config.
 					if ($category) $category = $news->category_id($category);
-						 
+
 					if (!$category) {
 						if (isset($extConf['default_category'])) {
 							$category = $news->category_id($extConf['default_category']);
@@ -231,9 +240,10 @@
 		function storebodyparts($bodyparts) {
 			 
 			$result = array(
-			'bodytext' => '',
+				'bodytext' => '',
 				'imagefilenames' => '',
-				'attachmentfilenames' => '' );
+				'attachmentfilenames' => ''
+				);
 			$imgs = 0;
 			$atts = 0;
 			 
@@ -252,15 +262,21 @@
 					// check file extension
 					// store attachment in pics or media
 					// add filename to imagefilenames or attachmentfilenames
-					 
-					$file = pathinfo($part['filename']);
+
+					// Use 'name' instead of 'filename' because filename gets encoded differently
+					$file = pathinfo($part['name']);
 					$fileext = strtolower($file['extension']);
-					$filename = $file['filename'] . '_' . substr(md5(time()), 0, 4);
+					$filename = $file['filename'];
+					// Convert special characters in filenames to double-chars version like ae, etc.
+					// Otherwise ImageMagick has troubles with them.
+					$filename = $GLOBALS['LANG']->csConvObj->specCharsToASCII($this->targetcharset, $filename);
 					 
 					if ($fileext !== '' && in_array($fileext, $imageextensions)) {
-						$this->saveattachment($filename, $fileext, PATH_uploads_pics, $part['content'], $this->extconf['max_image_size'], $result['imagefilenames'], $imgs);
+						//$this->saveattachment($filename, $fileext, PATH_uploads_pics, $part['content'], $this->extconf['max_image_size'], $result['imagefilenames'], $imgs);
+						$this->saveattachment($filename, $fileext, 'uploads/pics/', $part['content'], $this->extconf['max_image_size'], $result['imagefilenames'], $imgs);
 					} elseif ($fileext !== '' && in_array($fileext, $allowedextensions)) {
-						$this->saveattachment($filename, $fileext, PATH_uploads_media, $part['content'], $this->extconf['max_attachment_size'], $result['attachmentfilenames'], $atts);
+						//$this->saveattachment($filename, $fileext, PATH_uploads_media, $part['content'], $this->extconf['max_attachment_size'], $result['attachmentfilenames'], $atts);
+						$this->saveattachment($filename, $fileext, 'uploads/media/', $part['content'], $this->extconf['max_attachment_size'], $result['attachmentfilenames'], $atts);
 					}
 					 
 				}
@@ -272,18 +288,24 @@
 		*  Save attachment in $savepath and append filename to (referenced) $filelist variable, increment ref $counter
 		*/
 		function saveattachment($filename, $fileext, $savepath, $attachment, $maxsize, &$filelist, &$counter) {
-			 
+
 			if (strlen($attachment) <= $maxsize * 1024) {
-				$filename .= '_' . strval($counter+1) . '.' . $fileext;
-				$handle = @fopen($savepath . $filename, 'w');
-				if (!$handle) {
+				// $savedfilename is the filename as it will be saved, including _x counter in case
+				// file already exists
+				$savedfilename = $filename . '.' . $fileext;
+				$absfilename = t3lib_div::getFileAbsFileName($savepath . $savedfilename);
+				$i = 1;
+				while (file_exists($absfilename)) {
+					$savedfilename = $filename . '_' . $i . '.' . $fileext;
+					$absfilename = t3lib_div::getFileAbsFileName($savepath . $filename . '_' . $i . '.' . $fileext);
+					$i++;
+				}
+				if (!t3lib_div::writeFile($absfilename,$attachment)) {
 					die(date('Y-m-d H:i:s ') . "No permission to write file, quitting ... \n");
 					// TODO: more subtle exception here
 				}
-				fwrite($handle, $attachment);
-				fclose($handle);
-				// append filename to $filelist (image- or attachmentfilenames)
-				$filelist .= ($filelist == '' ? '' : ',') . $filename;
+				// append the savedfilename to $filelist (image- or attachmentfilenames)
+				$filelist .= ($filelist == '' ? '' : ',') . $savedfilename;
 				$counter++;
 			}
 			 

@@ -133,10 +133,10 @@
 		/**
 		* Sets the target character set to which appropriate text and header fields will be converted
 		* @param string $charset:	characterset of the current TYPO3 installation,
-		*							to which the incoming messages should be converted
+		*				to which the incoming messages should be converted
 		*/
 		function set_targetcharset($charset) {
-			$this->targetcharset = $charset;
+			$this->targetcharset = strtolower($charset);
 		}
 		 
 		/**
@@ -145,10 +145,10 @@
 		*/
 		function convert_to_targetcharset($string, $currentcharset) {
 			if (strcasecmp($currentcharset, 'windows-1252') == 0) {
-				$currentcharset = 'ISO-8859-1';
+				$currentcharset = 'iso-8859-1';
 			}
 			if (strcasecmp($currentcharset, 'default') == 0 || $currentcharset == '') {
-				$currentcharset = 'US-ASCII';
+				$currentcharset = 'us-ascii';
 			}
 			if (strcasecmp($currentcharset, $this->targetcharset) <> 0) {
 				$string = mb_convert_encoding($string, $this->targetcharset, $currentcharset);
@@ -250,31 +250,48 @@
 				$partbody = imap_fetchbody($this->mail, $msgno, $imappart); // $this->partno+1);
 				 
 				$part = array(
-				'is_text' => false,
+					'is_text' => false,
 					'is_attachment' => false,
 					'filename' => '',
 					'name' => '',
 					'content' => '',
-					'charset' => '' );
-				 
+					'charset' => ''
+					);
+
+				/*
+				 * get dparameters, if they exist
+				 * filename inside 'dparameters' gets encoded differently for more exotic charactersets,
+				 * therefor use name from 'parameters' to retrieve filename.
+				 */
 				if ($structure->ifdparameters) {
 					foreach($structure->dparameters as $object) {
-						if (strcasecmp($object->attribute, 'filename') == 0) {
+						if (strtolower(substr($object->attribute,0,8)) == 'filename') {
 							$part['is_attachment'] = true;
 							$part['filename'] = $this->decode_header_item($object->value);
 						}
+						/*
+						echo "------------ifdparameters:---------------IFD----------\n";
+						print_r($object); echo "\n";
+ 						echo "is_attachment: " . $part['is_attachment'] . "\n";
+						echo "filename: " . $part['filename'] . "\n";
+						 */
 					}
 				}
 				 
 				if ($structure->ifparameters) {
 					foreach($structure->parameters as $object) {
-						if (strcasecmp($object->attribute, 'name') == 0) {
+						if (strtolower($object->attribute) == 'name') {
 							$part['is_attachment'] = true;
+							// This will contain the filename of the image or attachment
 							$part['name'] = $this->decode_header_item($object->value);
 						}
-						if (strcasecmp($object->attribute, 'charset') == 0) {
+						if (strtolower($object->attribute) == 'charset') {
 							$part['charset'] = $object->value;
 						}
+						/*
+						echo "------------ifparameters:----------------IF-----------\n";
+						print_r($object); echo "\n";
+						 */
 					}
 				}
 				if ($structure->encoding == ENCBASE64) {

@@ -1,3 +1,15 @@
+10-05-06 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Now uses API methods for storing images and attachments
+	* No more random number prepended to filenames, if file exists, it gets
+	prepended with _1, _2, etc. (issue 7678)
+	* Fixed bug 7680, dealing with special chars in filenames. Filenames
+	have to be converted t3lib_cs::specCharsToASCII for ImageMagick to
+	handle them
+	* Fixed bug 3783, better formatting/improved html markup of bodytext (now
+	preserves br-tags for linebreaks, inserts p-tags at empty lines and removes
+	whitespace on empty lines (spc, &nbsp;, or tabs)
+
 10-04-29 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
 	* Fixed bug characterset conversion on a UTF-8 TYPO3 setup:
