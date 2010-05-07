@@ -1,5 +1,5 @@
 <?php
-	 
+
 	/***************************************************************
 	*  Copyright notice
 	*
@@ -34,23 +34,23 @@
 	* @author Loek Hilgersom <typo3extensions@netcoop.nl>
 	*/
 	/**
-	* [CLASS/FUNCTION INDEX of SCRIPT]
-	*
-	*
-	*
-	*   50: class tx_mail2news_ttnews
-	*   58:     function __construct()
-	*   68:     function category_id($category)
-	*   90:     function store_news($newsitem)
-	*
-	* TOTAL FUNCTIONS: 3
-	* (This index is automatically created/updated by the extension "extdeveval")
-	*
-	*/
+ * [CLASS/FUNCTION INDEX of SCRIPT]
+ *
+ *
+ *
+ *   50: class tx_mail2news_ttnews
+ *   58:     function __construct()
+ *   68:     function category_id($category)
+ *   90:     function store_news($newsitem)
+ *
+ * TOTAL FUNCTIONS: 3
+ * (This index is automatically created/updated by the extension "extdeveval")
+ *
+ */
 	class tx_mail2news_ttnews {
-		 
+
 		public $extconf;
-		 
+
 		/*
 		* Construct new object
 		*/
@@ -58,7 +58,7 @@
 		function __construct() {
 		}
 		*/
-		 
+
 		/*
 		*  Check if tt_news category exists.
 		*  First checks is $category is category-title, if not, checks if it matches uid.
@@ -80,17 +80,17 @@
 			}
 			return $uid;
 		}
-		 
+
 		/**
-		* [Describe function...]
-		*
-		* @param [type]  $newsitem: ...
-		* @return [type]  ...
-		*/
+ * [Describe function...]
+ *
+ * @param	[type]		$newsitem: ...
+ * @return	[type]		...
+ */
 		function store_news($newsitem) {
-			 
+
 			global $TYPO3_DB;
-			 
+
 			// Set category for this record?
 			$addCat = isset($newsitem['category']);
 			// tt_news field category in table tt_news contains no of categories
@@ -101,9 +101,9 @@
 				$newsitem['category'] = 0;
 			}
 			$newsitem['tstamp'] = $newsitem['crdate'] = time();
-			 
+
 			$TYPO3_DB->exec_INSERTquery('tt_news', $newsitem);
-			 
+
 			// Set category in table tt_news_cat_mm with UID of new record
 			if ($addCat) {
 				$catmm = array(
@@ -114,10 +114,10 @@
 				);
 				$TYPO3_DB->exec_INSERTquery('tt_news_cat_mm', $catmm);
 			}
-			 
+
 		}
 	}
-	 
+
 	if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/mail2news/class.tx_mail2news_ttnews.php']) {
 		include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/mail2news/class.tx_mail2news_ttnews.php']);
 	}

@@ -1,5 +1,5 @@
 <?php
-	 
+
 	/***************************************************************
 	*  Copyright notice
 	*
@@ -34,115 +34,122 @@
 	* @author Loek Hilgersom <typo3extensions@netcoop.nl>
 	*/
 	/**
-	* [CLASS/FUNCTION INDEX of SCRIPT]
-	*
-	*
-	*
-	*   58: class tx_mail2news_imap
-	*   71:     function __construct()
-	*   83:     function imap_connect($mail_server, $mail_username, $mail_password, $options)
-	*  102:     function imap_count_headers()
-	*  109:     function imap_delete_message($msgno)
-	*  118:     function imap_disconnect ()
-	*  128:     function set_targetcharset($charset)
-	*  136:     function convert_to_targetcharset($string, $currentcharset)
-	*  152:     function decode_header_item($item)
-	*  174:     function imap_get_message_header($msgno)
-	*  205:     function imap_get_message_body($msgno)
-	*  225:     function imap_get_message_part($structure, $msgno, $imappart='')
-	*
-	* TOTAL FUNCTIONS: 11
-	* (This index is automatically created/updated by the extension "extdeveval")
-	*
-	*/
+ * [CLASS/FUNCTION INDEX of SCRIPT]
+ *
+ *
+ *
+ *   58: class tx_mail2news_imap
+ *   71:     function __construct()
+ *   87:     function imap_connect($mail_server, $mail_username, $mail_password, $options)
+ *  108:     function imap_count_headers()
+ *  118:     function imap_delete_message($msgno)
+ *  127:     function imap_disconnect ()
+ *  141:     function set_targetcharset($charset)
+ *  153:     function convert_to_targetcharset($string, $currentcharset)
+ *  172:     function decode_header_item($item)
+ *  195:     function imap_get_message_header($msgno)
+ *  226:     function imap_get_message_body($msgno)
+ *  246:     function imap_get_message_part($structure, $msgno, $imappart = '')
+ *
+ * TOTAL FUNCTIONS: 11
+ * (This index is automatically created/updated by the extension "extdeveval")
+ *
+ */
 	class tx_mail2news_imap {
-		 
+
 		protected $mail;
 		var $targetcharset;
-		 
+
 		// message body data
 		protected $parts;
 		protected $partno;
-		 
+
 		/*
 		* Construct new IMAP object
 		*/
-		 
+
 		function __construct() {
 		}
-		 
+
 		/**
-		* Initialize IMAP connection
-		*
-		* @param string $mail_server: mailserver address
-		* @param string $mail_username: username of mailaccount
-		* @param string $mail_password: password
-		* @param array $options:
-		*   IMAP => boolean
-		*   SSL  => boolean
-		*   portno => integer, uses defaults if 0, empty or not set
-		* @return void
-		*/
-		 
+ * Initialize IMAP connection
+ *
+ *   IMAP => boolean
+ *   SSL  => boolean
+ *   portno => integer, uses defaults if 0, empty or not set
+ *
+ * @param	string		$mail_server: mailserver address
+ * @param	string		$mail_username: username of mailaccount
+ * @param	string		$mail_password: password
+ * @param	array		$options:
+ * @return	void
+ */
 		function imap_connect($mail_server, $mail_username, $mail_password, $options) {
-			 
+
 			$portno = $options['portno'];
 			if (!isset($portno) || $portno == '' || $portno == 0 ) {
 				if ($options['IMAP']) $portno = ($options['SSL'] ? 993 : 143);
 					else $portno = ($options['SSL'] ? 995 : 110);
 			}
-			 
+
 			$mailboxoptions = ':' . $portno . ($options['IMAP'] ? '/imap' : '/pop3') . ($options['SSL'] ? '/ssl' : '') . ($options['self_signed_certificate'] ? '/novalidate-cert' : '') . '/notls';
-			 
+
 			$this->mail = imap_open('{' . $mail_server . $mailboxoptions . '}INBOX', $mail_username, $mail_password);
 			if (!$this->mail) {
 				die(date('Y-m-d H:i:s ') . 'Could not connect to mailserver. Quitting...' . "\n");
 			}
 		}
-		 
+
 		/**
-		* Returns the number of messages in inbox
-		*
-		* @return int: no. of messages
-		*/
+ * Returns the number of messages in inbox
+ *
+ * @return	int:		no. of messages
+ */
 		function imap_count_headers() {
 			return count(imap_headers($this->mail));
 		}
-		 
+
 		/**
-		* Delete message $msgno
-		*
-		* @param int $msgno: Number of the message to be deleted from mail account
-		*/
+ * Delete message $msgno
+ *
+ * @param	int		$msgno: Number of the message to be deleted from mail account
+ * @return	[type]		...
+ */
 		function imap_delete_message($msgno) {
 			imap_delete($this->mail, $msgno);
 		}
-		 
+
 		/**
-		* Disconnect from POP3/IMAP mailbox
-		*
-		* @return void
-		*/
+ * Disconnect from POP3/IMAP mailbox
+ *
+ * @return	void
+ */
 		function imap_disconnect () {
 			// really remove messages marked as deleted
 			imap_expunge($this->mail);
 			// close connection
 			imap_close($this->mail);
 		}
-		 
+
 		/**
-		* Sets the target character set to which appropriate text and header fields will be converted
-		* @param string $charset:	characterset of the current TYPO3 installation,
-		*				to which the incoming messages should be converted
-		*/
+ * Sets the target character set to which appropriate text and header fields will be converted
+ * 				to which the incoming messages should be converted
+ *
+ * @param	string		$charset:	characterset of the current TYPO3 installation,
+ * @return	[type]		...
+ */
 		function set_targetcharset($charset) {
 			$this->targetcharset = strtolower($charset);
 		}
-		 
+
 		/**
-		*  Checks if charset is different from target charset, if so, convert
-		*  windows-1252 is treated as ISO-8859-1, default as US-ASCII
-		*/
+ * Checks if charset is different from target charset, if so, convert
+ *  windows-1252 is treated as ISO-8859-1, default as US-ASCII
+ *
+ * @param	[type]		$string: ...
+ * @param	[type]		$currentcharset: ...
+ * @return	[type]		...
+ */
 		function convert_to_targetcharset($string, $currentcharset) {
 			if (strcasecmp($currentcharset, 'windows-1252') == 0) {
 				$currentcharset = 'iso-8859-1';
@@ -155,10 +162,13 @@
 			}
 			return $string;
 		}
-		 
+
 		/**
-		*  Decode multi-line mime-header item, get charset and convert if necessary
-		*/
+ * Decode multi-line mime-header item, get charset and convert if necessary
+ *
+ * @param	[type]		$item: ...
+ * @return	[type]		...
+ */
 		function decode_header_item($item) {
 			$result = '';
 			$decode = imap_mime_header_decode($item);
@@ -168,73 +178,73 @@
 			// remove tabs from multi-line format
 			return preg_replace("/\t/", '', $result);
 		}
-		 
+
 		/**
-		* Fetch header of message $msgno and return header fields:
-		* If charset is defined in header, the fields from name and subject are
-		* converted to target charset.
-		*
-		* @param int $msgno:	Number of the message in current inbox
-		* @return array: Array of header lines from the mail message:
-		*   fromemail => from: email address,
-		*   fromname => from: full name,
-		*   date => unix timestamp,
-		*   subject => message subject
-		*
-		*/
+ * Fetch header of message $msgno and return header fields:
+ * If charset is defined in header, the fields from name and subject are
+ * converted to target charset.
+ *
+ *   fromemail => from: email address,
+ *   fromname => from: full name,
+ *   date => unix timestamp,
+ *   subject => message subject
+ *
+ * @param	int		$msgno:	Number of the message in current inbox
+ * @return	array:		Array of header lines from the mail message:
+ */
 		function imap_get_message_header($msgno) {
-			 
+
 			$header = Array();
-			 
+
 			// parse message and sender
 			$headertext = imap_fetchheader($this->mail, $msgno);
 			$headerinfo = imap_headerinfo($this->mail, $msgno, 256, 256);
-			 
+
 			// Extract from_email
 			$from = $headerinfo->from[0];
 			$header['fromemail'] = $from->mailbox . '@' . $from->host;
 			// Extract from_name
 			$header['fromname'] = $this->decode_header_item($from->personal);
-			 
+
 			// Extract message date and translate to unix timestamp
 			$decode = imap_mime_header_decode($headerinfo->udate);
 			$header['date'] = $decode[0]->text;
-			 
+
 			// decode multi-line message subject
 			$header['subject'] = $this->decode_header_item($headerinfo->subject);
-			 
+
 			return $header;
-			 
+
 		}
-		 
+
 		/**
-		* [Describe function...]
-		*
-		* @param [type]  $msgno: ...
-		* @return [type]  ...
-		*/
+ * [Describe function...]
+ *
+ * @param	[type]		$msgno: ...
+ * @return	[type]		...
+ */
 		function imap_get_message_body($msgno) {
-			 
+
 			$structure = imap_fetchstructure($this->mail, $msgno);
-			 
+
 			$this->parts = array();
 			$this->partno = 0;
-			 
+
 			$this->imap_get_message_part($structure, $msgno);
-			 
+
 			return $this->parts;
 		}
-		 
+
 		/**
-		* [Describe function...]
-		*
-		* @param [type]  $structure: ...
-		* @param [type]  $msgno: ...
-		* @param [type]  $imappart: ...
-		* @return [type]  ...
-		*/
+ * [Describe function...]
+ *
+ * @param	[type]		$structure: ...
+ * @param	[type]		$msgno: ...
+ * @param	[type]		$imappart: ...
+ * @return	[type]		...
+ */
 		function imap_get_message_part($structure, $msgno, $imappart = '') {
-			 
+
 			if (isset($structure->parts)) {
 				//$structure->type == TYPEMULTIPART || strcasecmp($structure->subtype, 'ALTERNATIVE') &&
 				$i = 1;
@@ -245,10 +255,10 @@
 					$i++;
 				}
 			} else {
-				 
+
 				if ($imappart == '') $imappart = '1';
 				$partbody = imap_fetchbody($this->mail, $msgno, $imappart); // $this->partno+1);
-				 
+
 				$part = array(
 					'is_text' => false,
 					'is_attachment' => false,
@@ -277,7 +287,7 @@
 						 */
 					}
 				}
-				 
+
 				if ($structure->ifparameters) {
 					foreach($structure->parameters as $object) {
 						if (strtolower($object->attribute) == 'name') {
@@ -303,18 +313,18 @@
 				} else {
 					$part['content'] = $partbody;
 				}
-				 
+
 				if ($structure->ifsubtype && strcasecmp($structure->subtype, 'HTML') == 0 ) {
 					// No support for html-mail (yet?)
 				}
-				 
+
 				if ($structure->ifsubtype && strcasecmp($structure->subtype, 'PLAIN') == 0 ) {
 					$part['is_text'] = true;
 					// Remove soft CR-LFs (preg_replace)
 					$part['content'] = preg_replace("/ \r\n/", ' ', trim($part['content']));
 					$part['content'] = $this->convert_to_targetcharset($part['content'], $part['charset']);
 				}
-				 
+
 				// Skip unknown parts
 				if ($part['is_text'] || $part['is_attachment']) {
 					$this->parts[$this->partno] = $part;
@@ -324,7 +334,7 @@
 			}
 		}
 	}
-	 
+
 	if (defined('TYPO3_MODE') && $TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/mail2news/class.tx_mail2news_imap.php']) {
 		include_once($TYPO3_CONF_VARS[TYPO3_MODE]['XCLASS']['ext/mail2news/class.tx_mail2news_imap.php']);
 	}
