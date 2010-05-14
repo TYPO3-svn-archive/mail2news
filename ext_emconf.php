@@ -12,7 +12,7 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Mail to tt_news',
-	'description' => 'Import messages from an email account into tt_news records. The easiest way to publish content on your site. Start "moblogging" with TYPO3!',
+	'description' => 'Import messages from an email account into tt_news records. The easiest way to publish content on your site, start "moblogging" with TYPO3!',
 	'category' => 'services',
 	'author' => 'Loek Hilgersom',
 	'author_email' => 'typo3extensions@netcoop.nl',

@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes" ?>
+<T3locallang>
+    <meta type="array">
+        <description>CSH for mail2news importer records</description>
+        <type>CSH</type>
+        <csh_table>tx_mail2news_importer</csh_table>
+        <fileId>EXT:mail2news/locallang_csh_importer.xml</fileId>
+    </meta>
+    <data type="array">
+        <languageKey index="default" type="array">
+        <!-- The first label .description will be shown next to the table in list module -->
+            <label index=".description">Configuration options for mail-to-news importers</label>
+            <label index="allowed_senders.description">Enter allowed from-email-addresses or part of the email addresses, comma separated. '@' allowes all email addresses.</label>
+            <label index="title.description">This field has no function except for yourself, to identify this record.</label>
+            <label index="override_sections.description">The default settings are set in the Extension Manager. Here you can choose which fields you want to change for this specific importer</label>
+            <label index="use_ssl.description">Enable only if your mailserver supports this</label>
+            <label index="self_signed_certificate.description">If your mailserver uses a self-signed SSL certificate you can allow this here</label>
+            <label index="portno.description">Leave 0 or empty to use defaults</label>
+            <label index="delete_after_download.description">Delete messages from email account after they are succesfully processed</label>
+            <label index="delete_rejected_mail.description">Also delete messages that where rejected because of sender not in allowed senders or other reason. Do not use this on a shared email account!</label>
+            <label index="concatenate_text_parts.description">In the default setting only the first text part is imported, which skips separate signature parts. Check this box to import and concatenate all text parts of multi-part messages.</label>
+            <label index="imageextensions.description">Comma separated list of image extensions, like png,jpg,gif. Files with extensions used here will be filtered to news images and will NOT end up at the news file attachments.</label>
+            <label index="attachmentextensions.description">Comma separated list of file extensions, like pdf,odt,doc, etc.</label>
+            <label index="category_identifier.description">The starting characters of the line in the email message that indicates the news category. This line must be the first or second line of the message.</label>
+            <label index="subheader_identifier.description">The starting characters of the line in the email message where you can add the text for the tt_news subheader field. This line must be the first or second line of the message.</label>
+            <label index="default_category.description">Title or ID of default ttnews category for news items created by this extension, used if no (valid) category has been set in email message.</label>
+            <label index="news_cruser_id.description">ID of the backend user to whom the created news items will be assigned.</label>
+            <label index="hide_by_default.description">If checkes, new records will only show on the website after a backend user unhides them.</label>
+            <label index="clearcachecmd.description">Comma separated list of page IDs where the created news records will be shown, of which the cache needs to be cleared for the new items to be shown.</label>
+        </languageKey>
+    </data>
+</T3locallang>

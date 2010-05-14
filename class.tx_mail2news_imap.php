@@ -88,11 +88,11 @@
 
 			$portno = $options['portno'];
 			if (!isset($portno) || $portno == '' || $portno == 0 ) {
-				if ($options['IMAP']) $portno = ($options['SSL'] ? 993 : 143);
-					else $portno = ($options['SSL'] ? 995 : 110);
+				if ($options['imap']) $portno = ($options['use_ssl'] ? 993 : 143);
+					else $portno = ($options['use_ssl'] ? 995 : 110);
 			}
 
-			$mailboxoptions = ':' . $portno . ($options['IMAP'] ? '/imap' : '/pop3') . ($options['SSL'] ? '/ssl' : '') . ($options['self_signed_certificate'] ? '/novalidate-cert' : '') . '/notls';
+			$mailboxoptions = ':' . $portno . ($options['imap'] ? '/imap' : '/pop3') . ($options['use_ssl'] ? '/ssl' : '') . ($options['self_signed_certificate'] ? '/novalidate-cert' : '') . '/notls';
 
 			$this->mail = imap_open('{' . $mail_server . $mailboxoptions . '}INBOX', $mail_username, $mail_password);
 			if (!$this->mail) {

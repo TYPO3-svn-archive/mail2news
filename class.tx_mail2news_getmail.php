@@ -133,7 +133,7 @@
 					// supply additional fields from configuration defaults
 					$newsitem['pid'] = $extConf['pid'];
 					$newsitem['hidden'] = $extConf['hide_by_default'];
-					$newsitem['cruser_id'] = $extConf['cruser_id'];
+					$newsitem['cruser_id'] = $extConf['news_cruser_id'];
 
 					// Check news category: first check if category from message is valid,
 					// if not, check default category from em config.
@@ -165,8 +165,8 @@
 			$imap->imap_disconnect();
 
 			// Clear page cache for pages set in extConf, if new records are not hidden
-			if (!$extConf['hide_by_default'] && isset($extConf['clearCacheCmd']) && $itemadded) {
-				$this->clearpagecache($extConf['clearCacheCmd']);
+			if (!$extConf['hide_by_default'] && isset($extConf['clearcachecmd']) && $itemadded) {
+				$this->clearpagecache($extConf['clearcachecmd']);
 			}
 
 			unset($header, $body, $msg, $newsitem, $TYPO3_CONF_VARS, $TYPO3_DB);
