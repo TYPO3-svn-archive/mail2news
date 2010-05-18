@@ -217,18 +217,22 @@ $TCA['tx_mail2news_importer'] = array (
 			'exclude' => 1,		
 			'label' => 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.default_category',		
 			'config' => array (
-				'type' => 'input',	
-				'size' => '30',
+				'type' => 'select',
+				'foreign_table' => 'tt_news_cat',
+				'foreign_table_where' => 'ORDER BY tt_news_cat.title',
+				'size' => 1,
+				'minitems' => 0,
+				'maxitems' => 1,
 			)
 		),
 		'news_cruser_id' => array (		
 			'exclude' => 1,		
 			'label' => 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.news_cruser_id',		
 			'config' => array (
-				'type' => 'select',	
-				'foreign_table' => 'be_users',	
-				'foreign_table_where' => 'ORDER BY be_users.uid',	
-				'size' => 1,	
+				'type' => 'select',
+				'foreign_table' => 'be_users',
+				'foreign_table_where' => 'ORDER BY be_users.uid',
+				'size' => 1,
 				'minitems' => 0,
 				'maxitems' => 1,
 			)
@@ -248,56 +252,27 @@ $TCA['tx_mail2news_importer'] = array (
 				'size' => '30',	
 				'eval' => 'nospace',
 			)
-		),
-	),
-	'types' => array (
-		'0' => array('showitem' => 
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.mailbox, mail_server, mail_username, mail_password, imap, use_ssl, self_signed_certificate, portno, delete_after_download, delete_rejected_mail,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.processing, concatenate_text_parts, max_image_size, max_attachment_size, imageextensions, attachmentextensions,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.newsrecord, category_identifier, subheader_identifier, default_category, news_cruser_id, hide_by_default, clearcachecmd,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
-		'6' => array('showitem' =>
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.mailbox, mail_server, mail_username, mail_password, imap, use_ssl, self_signed_certificate, portno, delete_after_download, delete_rejected_mail,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
-		'5' => array('showitem' =>
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.processing, concatenate_text_parts, max_image_size, max_attachment_size, imageextensions, attachmentextensions,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
-		'3' => array('showitem' =>
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.newsrecord, category_identifier, subheader_identifier, default_category, news_cruser_id, hide_by_default, clearcachecmd,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
-		'4' => array('showitem' =>
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.mailbox, mail_server, mail_username, mail_password, imap, use_ssl, self_signed_certificate, portno, delete_after_download, delete_rejected_mail,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.processing, concatenate_text_parts, max_image_size, max_attachment_size, imageextensions, attachmentextensions,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
-		'2' => array('showitem' =>
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.mailbox, mail_server, mail_username, mail_password, imap, use_ssl, self_signed_certificate, portno, delete_after_download, delete_rejected_mail,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.newsrecord, category_identifier, subheader_identifier, default_category, news_cruser_id, hide_by_default, clearcachecmd,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
-		'1' => array('showitem' =>
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.processing, concatenate_text_parts, max_image_size, max_attachment_size, imageextensions, attachmentextensions,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.newsrecord, category_identifier, subheader_identifier, default_category, news_cruser_id, hide_by_default, clearcachecmd,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
-		'7' => array('showitem' =>
-			'--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,
-			--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,'
-		),
+		)
 	),
 	'palettes' => array (
-		'1' => array('showitem' => '')
-	)
+		'1' => array('showitem' => ''),
+	),
+);
+
+$tabgeneral = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,';
+$tabmailbox = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.mailbox, mail_server, mail_username, mail_password, imap, use_ssl, self_signed_certificate, portno, delete_after_download, delete_rejected_mail,';
+$tabprocessing = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.processing, concatenate_text_parts, max_image_size, max_attachment_size, imageextensions, attachmentextensions,';
+$tabnewsrecord = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.newsrecord, category_identifier, subheader_identifier, default_category, news_cruser_id, hide_by_default, clearcachecmd,';
+$tabextended = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,';
+		
+$TCA['tx_mail2news_importer']['types'] = array (
+	'0' => array('showitem' => $tabgeneral . $tabmailbox . $tabprocessing . $tabnewsrecord . $tabextended),
+	'6' => array('showitem' => $tabgeneral . $tabmailbox . $tabextended),
+	'5' => array('showitem' => $tabgeneral . $tabprocessing . $tabextended),
+	'3' => array('showitem' => $tabgeneral . $tabnewsrecord . $tabextended),
+	'4' => array('showitem' => $tabgeneral . $tabmailbox . $tabprocessing . $tabextended),
+	'2' => array('showitem' => $tabgeneral . $tabmailbox . $tabnewsrecord . $tabextended),
+	'1' => array('showitem' => $tabgeneral . $tabprocessing . $tabnewsrecord . $tabextended),
+	'7' => array('showitem' => $tabgeneral . $tabextended),
 );
 ?>

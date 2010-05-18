@@ -63,6 +63,7 @@
 		// message body data
 		protected $parts;
 		protected $partno;
+		private $extKey = 'mail2news';
 
 		/*
 		* Construct new IMAP object
@@ -72,18 +73,18 @@
 		}
 
 		/**
- * Initialize IMAP connection
- *
- *   IMAP => boolean
- *   SSL  => boolean
- *   portno => integer, uses defaults if 0, empty or not set
- *
- * @param	string		$mail_server: mailserver address
- * @param	string		$mail_username: username of mailaccount
- * @param	string		$mail_password: password
- * @param	array		$options:
- * @return	void
- */
+		 * Initialize IMAP connection
+		 *
+		 *   IMAP => boolean
+		 *   SSL  => boolean
+		 *   portno => integer, uses defaults if 0, empty or not set
+		 *
+		 * @param	string		$mail_server: mailserver address
+		 * @param	string		$mail_username: username of mailaccount
+		 * @param	string		$mail_password: password
+		 * @param	array		$options:
+		 * @return	void
+		 */
 		function imap_connect($mail_server, $mail_username, $mail_password, $options) {
 
 			$portno = $options['portno'];
@@ -96,34 +97,38 @@
 
 			$this->mail = imap_open('{' . $mail_server . $mailboxoptions . '}INBOX', $mail_username, $mail_password);
 			if (!$this->mail) {
-				die(date('Y-m-d H:i:s ') . 'Could not connect to mailserver. Quitting...' . "\n");
+				$logmsg = 'Could not connect to mailserver (' . $mail_server . ') using importer on page PID (' . $options['pid'] . ').';
+				$error = 1;
+				$GLOBALS['BE_USER']->simplelog($logmsg, $this->extKey, $error);
+				return FALSE;
 			}
+			return TRUE;
 		}
 
 		/**
- * Returns the number of messages in inbox
- *
- * @return	int:		no. of messages
- */
+		 * Returns the number of messages in inbox
+		 *
+		 * @return	int:		no. of messages
+		 */
 		function imap_count_headers() {
 			return count(imap_headers($this->mail));
 		}
 
 		/**
- * Delete message $msgno
- *
- * @param	int		$msgno: Number of the message to be deleted from mail account
- * @return	[type]		...
- */
+		 * Delete message $msgno
+		 *
+		 * @param	int		$msgno: Number of the message to be deleted from mail account
+		 * @return	[type]		...
+		 */
 		function imap_delete_message($msgno) {
 			imap_delete($this->mail, $msgno);
 		}
 
 		/**
- * Disconnect from POP3/IMAP mailbox
- *
- * @return	void
- */
+		 * Disconnect from POP3/IMAP mailbox
+		 *
+		 * @return	void
+		 */
 		function imap_disconnect () {
 			// really remove messages marked as deleted
 			imap_expunge($this->mail);
@@ -132,24 +137,24 @@
 		}
 
 		/**
- * Sets the target character set to which appropriate text and header fields will be converted
- * 				to which the incoming messages should be converted
- *
- * @param	string		$charset:	characterset of the current TYPO3 installation,
- * @return	[type]		...
- */
+		 * Sets the target character set to which appropriate text and header fields will be converted
+		 * 				to which the incoming messages should be converted
+		 *
+		 * @param	string		$charset:	characterset of the current TYPO3 installation,
+		 * @return	[type]		...
+		 */
 		function set_targetcharset($charset) {
 			$this->targetcharset = strtolower($charset);
 		}
 
 		/**
- * Checks if charset is different from target charset, if so, convert
- *  windows-1252 is treated as ISO-8859-1, default as US-ASCII
- *
- * @param	[type]		$string: ...
- * @param	[type]		$currentcharset: ...
- * @return	[type]		...
- */
+		 * Checks if charset is different from target charset, if so, convert
+		 *  windows-1252 is treated as ISO-8859-1, default as US-ASCII
+		 *
+		 * @param	[type]		$string: ...
+		 * @param	[type]		$currentcharset: ...
+		 * @return	[type]		...
+		 */
 		function convert_to_targetcharset($string, $currentcharset) {
 			if (strcasecmp($currentcharset, 'windows-1252') == 0) {
 				$currentcharset = 'iso-8859-1';
@@ -164,11 +169,11 @@
 		}
 
 		/**
- * Decode multi-line mime-header item, get charset and convert if necessary
- *
- * @param	[type]		$item: ...
- * @return	[type]		...
- */
+		 * Decode multi-line mime-header item, get charset and convert if necessary
+		 *
+		 * @param	[type]		$item: ...
+		 * @return	[type]		...
+		 */
 		function decode_header_item($item) {
 			$result = '';
 			$decode = imap_mime_header_decode($item);
@@ -180,18 +185,18 @@
 		}
 
 		/**
- * Fetch header of message $msgno and return header fields:
- * If charset is defined in header, the fields from name and subject are
- * converted to target charset.
- *
- *   fromemail => from: email address,
- *   fromname => from: full name,
- *   date => unix timestamp,
- *   subject => message subject
- *
- * @param	int		$msgno:	Number of the message in current inbox
- * @return	array:		Array of header lines from the mail message:
- */
+		 * Fetch header of message $msgno and return header fields:
+		 * If charset is defined in header, the fields from name and subject are
+		 * converted to target charset.
+		 *
+		 *   fromemail => from: email address,
+		 *   fromname => from: full name,
+		 *   date => unix timestamp,
+		 *   subject => message subject
+		 *
+		 * @param	int		$msgno:	Number of the message in current inbox
+		 * @return	array:		Array of header lines from the mail message:
+		 */
 		function imap_get_message_header($msgno) {
 
 			$header = Array();
@@ -218,11 +223,11 @@
 		}
 
 		/**
- * [Describe function...]
- *
- * @param	[type]		$msgno: ...
- * @return	[type]		...
- */
+		 * [Describe function...]
+		 *
+		 * @param	[type]		$msgno: ...
+		 * @return	[type]		...
+		 */
 		function imap_get_message_body($msgno) {
 
 			$structure = imap_fetchstructure($this->mail, $msgno);
@@ -236,13 +241,13 @@
 		}
 
 		/**
- * [Describe function...]
- *
- * @param	[type]		$structure: ...
- * @param	[type]		$msgno: ...
- * @param	[type]		$imappart: ...
- * @return	[type]		...
- */
+		 * [Describe function...]
+		 *
+		 * @param	[type]		$structure: ...
+		 * @param	[type]		$msgno: ...
+		 * @param	[type]		$imappart: ...
+		 * @return	[type]		...
+		 */
 		function imap_get_message_part($structure, $msgno, $imappart = '') {
 
 			if (isset($structure->parts)) {

@@ -63,3 +63,6 @@ hide_by_default = 1
 
   # cat=basic; type=string; label=Clear cache of these pages: Comma separated list of page IDs where the created news records will be shown, of which the cache needs to be cleared for the new items to be shown. 
 clearCacheCmd = 
+
+  # cat=basic; type=boolean; label=Use TCEmain for DB inserts (Experimental): If set, new records are created using the full TYPO3 database functions, including permission checks and history rollback options etc. ATTENTION: to use this, the cli-user needs to have proper permissions to insert news records!
+usetcemain = 0

@@ -1,5 +1,17 @@
+18-05-06 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 1.9.7 beta
+	* Now supports multiple configurations using tx_mail2news_importer records (allowing use in multi-site installations, etc.)
+	* Added scheduler support
+	* Reference index is now properly updated after database inserts
+	* Now logs to sys_log table
+	* Improved error handling (write to sys_log and continue)
+	* Optional DB inserts using TCEmain (includes full permissions, history, etc.)
+	* Added automatic link recognition in plain text body for urls and email addresses
+
 10-05-06 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
+	* Version 1.9.6 beta
 	* Now uses API methods for storing images and attachments
 	* No more random number prepended to filenames, if file exists, it gets
 	prepended with _1, _2, etc. (issue 7678)

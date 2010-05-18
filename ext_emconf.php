@@ -3,7 +3,7 @@
 ########################################################################
 # Extension Manager/Repository config file for ext "mail2news".
 #
-# Auto generated 07-05-2010 14:28
+# Auto generated 18-05-2010 17:07
 #
 # Manual updates:
 # Only the data in the array - everything else is removed by next
@@ -29,7 +29,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
 	'author_company' => 'NetCoop.nl',
-	'version' => '1.9.6',
+	'version' => '1.9.7',
 	'constraints' => array(
 		'depends' => array(
 			'tt_news' => '2.0.0',
@@ -41,7 +41,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'suggests' => array(
 		),
 	),
-	'_md5_values_when_last_written' => 'a:15:{s:9:"ChangeLog";s:4:"7bd5";s:10:"README.txt";s:4:"170f";s:30:"class.tx_mail2news_getmail.php";s:4:"fdbf";s:27:"class.tx_mail2news_imap.php";s:4:"c195";s:29:"class.tx_mail2news_ttnews.php";s:4:"5244";s:21:"ext_conf_template.txt";s:4:"a97c";s:12:"ext_icon.gif";s:4:"d436";s:17:"ext_localconf.php";s:4:"d56c";s:15:"ext_php_api.dat";s:4:"0cbe";s:15:"getmail_cli.php";s:4:"1687";s:8:"init.php";s:4:"69ad";s:14:"doc/manual.sxw";s:4:"dd91";s:21:"doc/screenshot-em.png";s:4:"887e";s:19:"doc/wizard_form.dat";s:4:"3f4c";s:20:"doc/wizard_form.html";s:4:"3dad";}',
+	'_md5_values_when_last_written' => 'a:23:{s:9:"ChangeLog";s:4:"9e2c";s:10:"README.txt";s:4:"170f";s:30:"class.tx_mail2news_getmail.php";s:4:"7b0f";s:27:"class.tx_mail2news_imap.php";s:4:"f8ac";s:38:"class.tx_mail2news_scheduler_start.php";s:4:"a6e5";s:29:"class.tx_mail2news_ttnews.php";s:4:"8afb";s:16:"ext_autoload.php";s:4:"ea28";s:21:"ext_conf_template.txt";s:4:"1d66";s:12:"ext_icon.gif";s:4:"d436";s:17:"ext_localconf.php";s:4:"0287";s:15:"ext_php_api.dat";s:4:"0cbe";s:14:"ext_tables.php";s:4:"2215";s:14:"ext_tables.sql";s:4:"add1";s:15:"getmail_cli.php";s:4:"d563";s:30:"icon_tx_mail2news_importer.gif";s:4:"d436";s:8:"init.php";s:4:"69ad";s:26:"locallang_csh_importer.xml";s:4:"8ba4";s:16:"locallang_db.xml";s:4:"3d84";s:7:"tca.php";s:4:"9f26";s:14:"doc/manual.sxw";s:4:"dd91";s:21:"doc/screenshot-em.png";s:4:"887e";s:19:"doc/wizard_form.dat";s:4:"b8c3";s:20:"doc/wizard_form.html";s:4:"c6a8";}',
 	'suggests' => array(
 	),
 );

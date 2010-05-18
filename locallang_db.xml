@@ -13,9 +13,9 @@
 			<label index="tx_mail2news_importer.override_sections.I.1">mailbox parameters only</label>
 			<label index="tx_mail2news_importer.override_sections.I.2">processing parameters only</label>
 			<label index="tx_mail2news_importer.override_sections.I.3">news record parameters only</label>
-			<label index="tx_mail2news_importer.override_sections.I.4">processing and mailbox parameters</label>
-			<label index="tx_mail2news_importer.override_sections.I.5">news record and mailbox parameters</label>
-			<label index="tx_mail2news_importer.override_sections.I.6">news record and processing parameters</label>
+			<label index="tx_mail2news_importer.override_sections.I.4">mailbox and processing parameters</label>
+			<label index="tx_mail2news_importer.override_sections.I.5">mailbox and news record parameters</label>
+			<label index="tx_mail2news_importer.override_sections.I.6">processing and news record parameters</label>
 			<label index="tx_mail2news_importer.override_sections.I.7">none</label>
 			<label index="tx_mail2news_importer.override_sections">Select which defaults to override for this importer</label>
 			<label index="tx_mail2news_importer.tabs.general">General</label>
