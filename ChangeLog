@@ -1,4 +1,4 @@
-18-05-06 Loek Hilgersom  <typo3extensions@netcoop.nl>
+10-05-18 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
 	* Version 1.9.7 beta
 	* Now supports multiple configurations using tx_mail2news_importer records (allowing use in multi-site installations, etc.)
