@@ -92,7 +92,7 @@ class tx_mail2news_getmail extends t3lib_cli {
 		$where = '1=1' . t3lib_BEfunc::BEenableFields($table) . t3lib_BEfunc::deleteClause($table);
 		$res = $TYPO3_DB->exec_SELECTquery('*', $table, $where, '', 'sorting');
 
-		if($res !== false) {
+		if($TYPO3_DB->sql_num_rows($res)> 0) {
 			// mail2news importer records found, execute import script for each record
 			while (false !== ($ar = $TYPO3_DB->sql_fetch_assoc($res))) {
 				$obligatory_parameters = array_intersect_key($ar, array_flip(array('pid', 'allowed_senders')));
