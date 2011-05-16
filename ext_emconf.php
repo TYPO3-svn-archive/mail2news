@@ -12,16 +12,16 @@
 
 $EM_CONF[$_EXTKEY] = array(
 	'title' => 'Mail to tt_news',
-	'description' => 'Import messages from an email account into tt_news records. The easiest way to publish content on your site, start "moblogging" with TYPO3!',
+	'description' => 'Import messages from an email account into tt_news or t3blog records. The easiest way to publish content on your site, start "moblogging" with TYPO3!',
 	'category' => 'services',
 	'author' => 'Loek Hilgersom',
 	'author_email' => 'typo3extensions@netcoop.nl',
 	'shy' => '',
-	'dependencies' => 'tt_news',
+	'dependencies' => '',
 	'conflicts' => '',
 	'priority' => '',
 	'module' => '',
-	'state' => 'beta',
+	'state' => 'alpha',
 	'internal' => '',
 	'uploadfolder' => 0,
 	'createDirs' => '',
@@ -29,11 +29,10 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
 	'author_company' => 'NetCoop.nl',
-	'version' => '1.9.7',
+	'version' => '2.0.0 alpha',
 	'constraints' => array(
 		'depends' => array(
-			'tt_news' => '2.0.0',
-			'php' => '5.0.0-0.0.0',
+			'php' => '5.2.0-0.0.0',
 			'typo3' => '4.1.0-0.0.0',
 		),
 		'conflicts' => array(

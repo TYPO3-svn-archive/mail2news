@@ -4,7 +4,7 @@ if (!defined ('TYPO3_MODE')) 	die ('Access denied.');
 $TCA['tx_mail2news_importer'] = array (
 	'ctrl' => $TCA['tx_mail2news_importer']['ctrl'],
 	'interface' => array (
-		'showRecordFieldList' => 'hidden,title,override_sections,allowed_senders,mail_server,mail_username,mail_password,imap,use_ssl,self_signed_certificate,portno,delete_after_download,delete_rejected_mail,concatenate_text_parts,max_image_size,max_attachment_size,imageextensions,attachmentextensions,category_identifier,subheader_identifier,default_category,news_cruser_id,hide_by_default,clearcachecmd'
+		'showRecordFieldList' => 'hidden,title,override_sections,allowed_senders,mail_server,mail_username,mail_password,imap,use_ssl,self_signed_certificate,portno,delete_after_download,delete_rejected_mail,concatenate_text_parts,max_image_size,max_attachment_size,imageextensions,attachmentextensions,record_type,category_identifier,subheader_identifier,default_category,news_cruser_id,hide_by_default,clearcachecmd'
 	),
 	'feInterface' => $TCA['tx_mail2news_importer']['feInterface'],
 	'columns' => array (
@@ -197,44 +197,30 @@ $TCA['tx_mail2news_importer'] = array (
 				'eval' => 'nospace',
 			)
 		),
-		'category_identifier' => array (		
-			'exclude' => 1,		
-			'label' => 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.category_identifier',		
-			'config' => array (
-				'type' => 'input',	
-				'size' => '12',
-			)
-		),
-		'subheader_identifier' => array (		
-			'exclude' => 1,		
-			'label' => 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.subheader_identifier',		
-			'config' => array (
-				'type' => 'input',	
-				'size' => '12',
-			)
-		),
-		'default_category' => array (		
-			'exclude' => 1,		
-			'label' => 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.default_category',		
+		'record_type' => array (
+			'exclude' => 1,
+			'label' => 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.record_type',
 			'config' => array (
 				'type' => 'select',
-				'foreign_table' => 'tt_news_cat',
-				'foreign_table_where' => 'ORDER BY tt_news_cat.title',
+				'items' => array (),
 				'size' => 1,
-				'minitems' => 0,
 				'maxitems' => 1,
+				'suppress_icons' => 1,
 			)
 		),
-		'news_cruser_id' => array (		
+//		'default_category' => array (),
+//		'default_t3blog_category' => array (),
+		'cruser_id' => array (		
 			'exclude' => 1,		
 			'label' => 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.news_cruser_id',		
 			'config' => array (
 				'type' => 'select',
 				'foreign_table' => 'be_users',
-				'foreign_table_where' => 'ORDER BY be_users.uid',
+				'foreign_table_where' => 'AND be_users.username NOT LIKE "_cli_%" ORDER BY be_users.uid',
 				'size' => 1,
 				'minitems' => 0,
 				'maxitems' => 1,
+				'suppress_icons' => 1,
 			)
 		),
 		'hide_by_default' => array (		
@@ -262,17 +248,47 @@ $TCA['tx_mail2news_importer'] = array (
 $tabgeneral = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.general, hidden;;1;;1-1-1, title;;;;2-2-2, allowed_senders, override_sections;;;;3-3-3,';
 $tabmailbox = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.mailbox, mail_server, mail_username, mail_password, imap, use_ssl, self_signed_certificate, portno, delete_after_download, delete_rejected_mail,';
 $tabprocessing = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.processing, concatenate_text_parts, max_image_size, max_attachment_size, imageextensions, attachmentextensions,';
-$tabnewsrecord = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.newsrecord, category_identifier, subheader_identifier, default_category, news_cruser_id, hide_by_default, clearcachecmd,';
 $tabextended = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.extended,';
-		
+$tabrecord = '--div--;LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.tabs.record, record_type';
+
+// Change available fields and options depending on which extensions are installed
+if ( t3lib_extMgm::isLoaded('tt_news') ) {
+	$TCA['tx_mail2news_importer']['columns']['record_type']['config']['items'][0] = array('LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.record_type.I.1' , 'tt_news');
+
+	// Copy TCA definition of tt_news category field, and only change the label
+	t3lib_div::loadTCA('tt_news');
+	$TCA['tx_mail2news_importer']['columns']['default_category'] = $TCA['tt_news']['columns']['category'];
+	$TCA['tx_mail2news_importer']['columns']['default_category']['label'] = 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.default_category';
+	$TCA['tx_mail2news_importer']['columns']['default_category']['config']['minitems'] = 0;
+
+	$TCA['tx_mail2news_importer']['showRecordFieldList'] .= ',default_category';
+	$tabrecord .= ', default_category';
+}
+
+if ( t3lib_extMgm::isLoaded('t3blog') ) {
+	$TCA['tx_mail2news_importer']['columns']['record_type']['config']['items'][1] = array('LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.record_type.I.2' , 't3blog');
+	
+	// Copy TCA definition of t3blog category field, and only change the label and set it as not-required
+	t3lib_div::loadTCA('tx_t3blog_post');
+	$TCA['tx_mail2news_importer']['columns']['default_t3blog_category'] = $TCA['tx_t3blog_post']['columns']['cat'];
+	$TCA['tx_mail2news_importer']['columns']['default_t3blog_category']['label'] = 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.default_t3blog_category';
+	$TCA['tx_mail2news_importer']['columns']['default_t3blog_category']['config']['minitems'] = 0;
+
+	$TCA['tx_mail2news_importer']['showRecordFieldList'] .= ',default_t3blog_category';
+	$tabrecord .= ', default_t3blog_category';
+}
+
+$tabrecord .= ', cruser_id, hide_by_default, clearcachecmd,';
+
+
 $TCA['tx_mail2news_importer']['types'] = array (
-	'0' => array('showitem' => $tabgeneral . $tabmailbox . $tabprocessing . $tabnewsrecord . $tabextended),
+	'0' => array('showitem' => $tabgeneral . $tabmailbox . $tabprocessing . $tabrecord . $tabextended),
 	'6' => array('showitem' => $tabgeneral . $tabmailbox . $tabextended),
 	'5' => array('showitem' => $tabgeneral . $tabprocessing . $tabextended),
-	'3' => array('showitem' => $tabgeneral . $tabnewsrecord . $tabextended),
+	'3' => array('showitem' => $tabgeneral . $tabrecord . $tabextended),
 	'4' => array('showitem' => $tabgeneral . $tabmailbox . $tabprocessing . $tabextended),
-	'2' => array('showitem' => $tabgeneral . $tabmailbox . $tabnewsrecord . $tabextended),
-	'1' => array('showitem' => $tabgeneral . $tabprocessing . $tabnewsrecord . $tabextended),
+	'2' => array('showitem' => $tabgeneral . $tabmailbox . $tabrecord . $tabextended),
+	'1' => array('showitem' => $tabgeneral . $tabprocessing . $tabrecord . $tabextended),
 	'7' => array('showitem' => $tabgeneral . $tabextended),
 );
 ?>

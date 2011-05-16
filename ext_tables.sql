@@ -27,10 +27,10 @@ CREATE TABLE tx_mail2news_importer (
 	max_attachment_size int(11) DEFAULT '0' NOT NULL,
 	imageextensions tinytext,
 	attachmentextensions tinytext,
-	category_identifier tinytext,
-	subheader_identifier tinytext,
+	record_type tinytext,
 	default_category tinytext,
-	news_cruser_id int(11) DEFAULT '0' NOT NULL,
+	default_t3blog_category tinytext,
+	cruser_id int(11) DEFAULT '0' NOT NULL,
 	hide_by_default tinyint(3) DEFAULT '0' NOT NULL,
 	clearcachecmd tinytext,
 	

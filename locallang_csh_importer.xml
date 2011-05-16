@@ -21,12 +21,12 @@
             <label index="concatenate_text_parts.description">In the default setting only the first text part is imported, which skips separate signature parts. Check this box to import and concatenate all text parts of multi-part messages.</label>
             <label index="imageextensions.description">Comma separated list of image extensions, like png,jpg,gif. Files with extensions used here will be filtered to news images and will NOT end up at the news file attachments.</label>
             <label index="attachmentextensions.description">Comma separated list of file extensions, like pdf,odt,doc, etc.</label>
-            <label index="category_identifier.description">The starting characters of the line in the email message that indicates the news category. This line must be the first or second line of the message.</label>
-            <label index="subheader_identifier.description">The starting characters of the line in the email message where you can add the text for the tt_news subheader field. This line must be the first or second line of the message.</label>
+            <label index="record_type.description">Mail2news can create news and blog records for the extensions tt_news and t3blog. You can only choose the options for which the extensions are installed (tt_news or t3blog)</label>
             <label index="default_category.description">Title or ID of default ttnews category for news items created by this extension, used if no (valid) category has been set in email message.</label>
-            <label index="news_cruser_id.description">ID of the backend user to whom the created news items will be assigned.</label>
-            <label index="hide_by_default.description">If checkes, new records will only show on the website after a backend user unhides them.</label>
-            <label index="clearcachecmd.description">Comma separated list of page IDs where the created news records will be shown, of which the cache needs to be cleared for the new items to be shown.</label>
+            <label index="default_t3blog_category.description">Title or ID of default t3blog category for blog items created by this extension, used if no (valid) category has been set in email message.</label>
+            <label index="news_cruser_id.description">ID of the backend user to whom the created records will be assigned.</label>
+            <label index="hide_by_default.description">If checked, new records will only show on the website after a backend user unhides them.</label>
+            <label index="clearcachecmd.description">Comma separated list of page IDs where the created content will be shown, of which the cache should be cleared for the new items to be shown.</label>
         </languageKey>
     </data>
 </T3locallang>

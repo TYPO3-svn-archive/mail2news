@@ -43,19 +43,16 @@ imageextensions = png,jpg,gif
   # cat=basic; type=string; label=Allowed extensions other attachments: Comma separated list of file extensions, like pdf,odt,doc, etc.
 allowedextensions = avi,csv,doc,eps,mdb,mp3,mp4,mpg,mov,odt,ods,otf,pdf,pps,ppt,rtf,sxw,sxc,swf,txt,ttf,wks,wpd,wps,xls,xml
 
-  # cat=basic; type=string; label=Category line identifier: The starting characters of the line in the email message that indicates the news category. This line must be the first or second line of the message.
-category_identifier = ##
+  # cat=basic; type=options[tt_news,t3blog]; label=record type: Type of records that will be created.
+record_type = tt_news
 
-  # cat=basic; type=string; label=Subheader line identifier: The starting characters of the line in the email message where you can add the text for the tt_news subheader field. This line must be the first or second line of the message.
-subheader_identifier = &&
-
-  # cat=basic; type=string; label=default ttnews category: Title or ID of default ttnews category for news items created by this extension, used if no (valid) category has been set in email message
+  # cat=basic; type=string; label=default categories: Comma-separated titles or ID's of categories for items (news or blog) created by this extension, used if no (valid) categories are set in email message
 default_category = 
 
-  # cat=basic; type=int; label=ttnews storage ID: ID of the ttnews storage folder where the news items will be created.
+  # cat=basic; type=int; label=storage ID: ID of the folder where the new records (news or blog) will be created.
 pid = 
 
-  # cat=basic; type=int; label=Backend user ID: ID of the backend user to whom the created news items will be assigned. 
+  # cat=basic; type=int; label=Backend user ID: ID of the backend user to whom the created records will be assigned.
 cruser_id = 
 
   # cat=basic; type=boolean; label=Hide new messages: Hide new news items by default, so they will show on the website only after a backend user unhides them.
