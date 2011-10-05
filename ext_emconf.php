@@ -3,7 +3,7 @@
 ########################################################################
 # Extension Manager/Repository config file for ext "mail2news".
 #
-# Auto generated 18-05-2010 17:07
+# Auto generated 05-10-2011 02:43
 #
 # Manual updates:
 # Only the data in the array - everything else is removed by next
@@ -29,7 +29,7 @@ $EM_CONF[$_EXTKEY] = array(
 	'clearCacheOnLoad' => 0,
 	'lockType' => '',
 	'author_company' => 'NetCoop.nl',
-	'version' => '1.9.9',
+	'version' => '2.0.0',
 	'constraints' => array(
 		'depends' => array(
 			'php' => '5.2.0-0.0.0',
@@ -40,7 +40,7 @@ $EM_CONF[$_EXTKEY] = array(
 		'suggests' => array(
 		),
 	),
-	'_md5_values_when_last_written' => 'a:23:{s:9:"ChangeLog";s:4:"9e2c";s:10:"README.txt";s:4:"170f";s:30:"class.tx_mail2news_getmail.php";s:4:"7b0f";s:27:"class.tx_mail2news_imap.php";s:4:"f8ac";s:38:"class.tx_mail2news_scheduler_start.php";s:4:"a6e5";s:29:"class.tx_mail2news_ttnews.php";s:4:"8afb";s:16:"ext_autoload.php";s:4:"ea28";s:21:"ext_conf_template.txt";s:4:"1d66";s:12:"ext_icon.gif";s:4:"d436";s:17:"ext_localconf.php";s:4:"0287";s:15:"ext_php_api.dat";s:4:"0cbe";s:14:"ext_tables.php";s:4:"2215";s:14:"ext_tables.sql";s:4:"add1";s:15:"getmail_cli.php";s:4:"d563";s:30:"icon_tx_mail2news_importer.gif";s:4:"d436";s:8:"init.php";s:4:"69ad";s:26:"locallang_csh_importer.xml";s:4:"8ba4";s:16:"locallang_db.xml";s:4:"3d84";s:7:"tca.php";s:4:"9f26";s:14:"doc/manual.sxw";s:4:"dd91";s:21:"doc/screenshot-em.png";s:4:"887e";s:19:"doc/wizard_form.dat";s:4:"b8c3";s:20:"doc/wizard_form.html";s:4:"c6a8";}',
+	'_md5_values_when_last_written' => 'a:26:{s:9:"ChangeLog";s:4:"2bbf";s:10:"README.txt";s:4:"170f";s:30:"class.tx_mail2news_getmail.php";s:4:"2e5a";s:27:"class.tx_mail2news_imap.php";s:4:"f8ac";s:38:"class.tx_mail2news_scheduler_start.php";s:4:"a6e5";s:29:"class.tx_mail2news_t3blog.php";s:4:"20a7";s:29:"class.tx_mail2news_ttnews.php";s:4:"a8b2";s:16:"ext_autoload.php";s:4:"ea28";s:21:"ext_conf_template.txt";s:4:"72d2";s:12:"ext_icon.gif";s:4:"d436";s:17:"ext_localconf.php";s:4:"7eec";s:15:"ext_php_api.dat";s:4:"0cbe";s:14:"ext_tables.php";s:4:"3a9b";s:14:"ext_tables.sql";s:4:"d7f7";s:15:"getmail_cli.php";s:4:"d563";s:30:"icon_tx_mail2news_importer.gif";s:4:"d436";s:8:"init.php";s:4:"69ad";s:26:"locallang_csh_importer.xml";s:4:"92b3";s:16:"locallang_db.xml";s:4:"2b02";s:7:"tca.php";s:4:"ad62";s:45:"Tests/Unit/class.tx_mail2news_getmailTest.php";s:4:"0c12";s:44:"Tests/Unit/class.tx_mail2news_ttnewsTest.php";s:4:"b79a";s:14:"doc/manual.sxw";s:4:"939e";s:21:"doc/screenshot-em.png";s:4:"887e";s:19:"doc/wizard_form.dat";s:4:"b8c3";s:20:"doc/wizard_form.html";s:4:"c6a8";}',
 	'suggests' => array(
 	),
 );
