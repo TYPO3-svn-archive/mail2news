@@ -70,33 +70,33 @@ class tx_mail2news_t3blog {
 	 * @return	string/boolean	csv string category_ids, FALSE if no matching category
 	 */
 	function category_ids($categories) {
-		global $TYPO3_DB;
-
-		$cat_array = explode( ',' , $categories );
-		$orderBy = '0';
-		$where = 'deleted=0 AND ( 0=1';
-		$i = 0;
-		foreach ($cat_array as $category) {
-			if (is_numeric($category)) {
-				$condition = 'uid=' . intval($category);
-			} elseif ( trim($category)!='' ) {
-				$condition = 'catname LIKE ' . $TYPO3_DB->fullQuoteStr(trim($category), 'tx_t3blog_cat');
-			} else {
-				continue;
-			}
-			$where .= ' OR ' . $condition;
-			// Monstruous construction for preserving sort order of categories, but it works!
-			$orderBy = 'IF(' . $condition . ', ' . $i++ . ', ' . $orderBy . ')';
-		}
-		$where .= ' )';
-		$rows = $TYPO3_DB->exec_SELECTgetRows( 'uid', 'tx_t3blog_cat', $where, '', $orderBy, '', 'uid' );
 
 		$category_ids = FALSE;
-		if (count($rows) >= 1) {
-			$category_ids = implode ( ',' , array_keys($rows) );
+		if(trim($categories!='')) {
+			$cat_array = explode( ',' , $categories );
+			$orderBy = '0';
+			$where = 'deleted=0 AND ( 0=1';
+			$i = 0;
+			foreach ($cat_array as $category) {
+				$category = trim($category);
+				if (is_numeric($category)) {
+					$condition = 'uid=' . intval($category);
+				} elseif ( trim($category)!='' ) {
+					$condition = 'title LIKE ' . $TYPO3_DB->fullQuoteStr($category, 'tt_news_cat');
+				} else {
+					continue;
+				}
+				$where .= ' OR ' . $condition;
+				// Monstruous construction for preserving sort order of categories, but it works!
+				$orderBy = 'IF(' . $condition . ', ' . $i++ . ', ' . $orderBy . ')';
+			}
+			$where .= ' )';
+			$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows( 'uid', 'tt_news_cat', $where, '', $orderBy, '', 'uid' );
+
+			if (count($rows) >= 1) {
+				$category_ids = implode ( ',' , array_keys($rows) );
+			}
 		}
-	#	t3lib_div::debug($rows, '$rows');
-	#	t3lib_div::debug($category_ids, '$categories');
 		return $category_ids;
 	}
 

@@ -74,7 +74,7 @@ class tx_mail2news_ttnews {
 		$rows = $TYPO3_DB->exec_SELECTgetRows(
 			'uid',
 			'tt_news_cat',
-			'title LIKE ' . $TYPO3_DB->fullQuoteStr($category, 'tt_news_cat') . ' AND deleted=0'
+			'title LIKE ' . $TYPO3_DB->fullQuoteStr( trim($category) , 'tt_news_cat') . ' AND deleted=0'
 		);
 
 		$uid = FALSE;
@@ -99,30 +99,32 @@ class tx_mail2news_ttnews {
 	 *  Output: csv string category_ids, FALSE if no matching category
 	 */
 	function category_ids($categories) {
-		global $TYPO3_DB;
-
-		$cat_array = explode( ',' , $categories );
-		$orderBy = '0';
-		$where = 'deleted=0 AND ( 0=1';
-		$i = 0;
-		foreach ($cat_array as $category) {
-			if (is_numeric($category)) {
-				$condition = 'uid=' . intval($category);
-			} elseif ( trim($category)!='' ) {
-				$condition = 'title LIKE ' . $TYPO3_DB->fullQuoteStr(trim($category), 'tt_news_cat');
-			} else {
-				continue;
-			}
-			$where .= ' OR ' . $condition;
-			// Monstruous construction for preserving sort order of categories, but it works!
-			$orderBy = 'IF(' . $condition . ', ' . $i++ . ', ' . $orderBy . ')';
-		}
-		$where .= ' )';
-		$rows = $TYPO3_DB->exec_SELECTgetRows( 'uid', 'tt_news_cat', $where, '', $orderBy, '', 'uid' );
 
 		$category_ids = FALSE;
-		if (count($rows) >= 1) {
-			$category_ids = implode ( ',' , array_keys($rows) );
+		if(trim($categories!='')) {
+			$cat_array = explode( ',' , $categories );
+			$orderBy = '0';
+			$where = 'deleted=0 AND ( 0=1';
+			$i = 0;
+			foreach ($cat_array as $category) {
+				$category = trim($category);
+				if (is_numeric($category)) {
+					$condition = 'uid=' . intval($category);
+				} elseif ( trim($category)!='' ) {
+					$condition = 'title LIKE ' . $TYPO3_DB->fullQuoteStr($category, 'tt_news_cat');
+				} else {
+					continue;
+				}
+				$where .= ' OR ' . $condition;
+				// Monstruous construction for preserving sort order of categories, but it works!
+				$orderBy = 'IF(' . $condition . ', ' . $i++ . ', ' . $orderBy . ')';
+			}
+			$where .= ' )';
+			$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows( 'uid', 'tt_news_cat', $where, '', $orderBy, '', 'uid' );
+
+			if (count($rows) >= 1) {
+				$category_ids = implode ( ',' , array_keys($rows) );
+			}
 		}
 	#	t3lib_div::debug($rows, '$rows');
 	#	t3lib_div::debug($category_ids, '$categories');
@@ -156,13 +158,10 @@ class tx_mail2news_ttnews {
 		// tt_news field category in table tt_news contains no of categories
 		if ($addCat) {
 			$categories = explode(',' ,$item['tx_mail2news_categories']);
-			$item['category'] = count($categories);
+			$tt_news['category'] = count($categories);
 		} else {
-			$item['category'] = 0;
+			$tt_news['category'] = 0;
 		}
-
-		if (!$item['crdate']) $item['crdate'] = time();
-		if (!$item['tstamp']) $item['tstamp'] = time();
 
 		if ($useTceMain) {
 

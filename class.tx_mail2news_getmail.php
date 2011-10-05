@@ -324,12 +324,21 @@ class tx_mail2news_getmail extends t3lib_cli {
 				$current_line = $parse_text[0];
 				array_shift($parse_text);
 				foreach ($field_markers as $fieldname => $marker) {
-					// Check if the current line matches one of the markers
-					if (preg_match('/^' . quotemeta($marker) . "(.*)?$/", $current_line, $match)) {
-						// If yes, add value to $marker_values
-						$marker_values[$fieldname] = trim($match[1]);
-						// And strip all lines up until this one from $bodytext
-						$bodytext = $parse_text;
+					// Skip arrays (because they contain special properties)
+					if (!is_array($marker)) {
+						// Check if the current line matches one of the markers
+						if (preg_match('/^' . quotemeta($marker) . "(.*)?$/", $current_line, $match)) {
+							// If yes, add value to $marker_values
+							$marker_value = trim($match[1]);
+							$marker_values[$fieldname] = $marker_value;
+							if (is_array($field_markers[$fieldname.'.']) && $field_markers[$fieldname.'.']['parseDate']) {
+								$timestamp = strtotime($marker_value);
+								// If recognized as a date format, assign the timestamp
+								if ($timestamp)	$marker_values[$fieldname] = $timestamp;
+							}
+							// And strip all lines up until this one from $bodytext
+							$bodytext = $parse_text;
+						}
 					}
 				}
 			}
