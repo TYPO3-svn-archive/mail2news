@@ -6,6 +6,7 @@
  */
 
 require_once (t3lib_extMgm::extPath('mail2news').'class.tx_mail2news_ttnews.php');
+require_once (t3lib_extMgm::extPath('mail2news').'Tests/Unit/Fixtures/class.tx_mail2news_phpunittypo3db.php');
 
 /**
  * Description of class
@@ -27,15 +28,26 @@ class tx_mail2news_ttnewsTest extends Tx_Phpunit_TestCase {
 	 */
 	private $backEndUserBackup = NULL;
 
+	/**
+	 * @var Tx_Phpunit_Framework
+	 */
+	private $tf;
+	
+	private $testDataCreated = FALSE;
+	
+	private $flippedTestData = array();
+	
 	public function setUp() {
 		$this->databaseBackup = $GLOBALS['TYPO3_DB'];
 		$this->backEndUserBackup = $GLOBALS['BE_USER'];
-
+		
+		$this->tf = new Tx_Phpunit_Framework('tt_news');
 		$this->fixture = new tx_mail2news_ttnews();
 	}
 
 	public function tearDown() {
-		unset($this->fixture);
+		$this->tf->cleanUp();
+		unset($this->fixture, $this->tf);
 
 		t3lib_div::purgeInstances();
 
@@ -43,10 +55,47 @@ class tx_mail2news_ttnewsTest extends Tx_Phpunit_TestCase {
 		$GLOBALS['BE_USER'] = $this->backEndUserBackup;
 	}
 
+	public function categoryIdsDataProvider() {
+
+		if ($this->testDataCreated) {
+			$testCategories = array('Blabla and such', 'Linux', 'Windows', 'Mac', 'OS2');
+			$testData = array();
+			$this->tf = new Tx_Phpunit_Framework('tt_news');
+			foreach ($testCategories as $testCategory) {
+				$uid = $this->tf->createRecord('tt_news_cat', array('title' => $testCategory));
+				$testData[$uid] = $testCategory;
+			}
+			$this->flippedTestData = array_flip($testData);
+			$this->testDataCreated = TRUE;
+		}
+		
+		return array(
+			'Empty argument returns FALSE' => array('', FALSE),
+			'Existing Catname returns uid' => array('Mac', strval($this->flippedTestData['Mac'])),
+			'2 existing catnames returns 2 uids' => array('Linux, OS2', strval($this->flippedTestData['Linux']) . ',' . strval($this->flippedTestData['OS2'])),
+			'2 existing catnames reversed returns 2 uids reversed' => array('OS2, Linux', strval($this->flippedTestData['OS2']) . ',' . strval($this->flippedTestData['Linux'])),
+		);
+
+	}
+
+//		$databaseMock = $this->getMock('t3lib_DB');
+//		$GLOBALS['TYPO3_DB'] = $databaseMock;
+	/**
+	 * @test
+	 * @dataProvider categoryIdsDataProvider
+	 */
+	public function categoryIdsReturnsExpectedValues($input, $expectedResult) {
+		$GLOBALS['TYPO3_DB'] = new tx_mail2news_phpunittypo3db($GLOBALS['TYPO3_DB']);
+		
+		$categoriesResult = $this->fixture->category_ids($input);
+		
+		$this->assertSame($expectedResult, $categoriesResult);
+	}
+	
 	/**
 	 * @test
 	 */
-	public function category_idsReturnsFalseOnEmptyInput() {
+	public function category_idsWithEmptyInputReturnsFalse() {
 		$categories = $this->fixture->category_ids('');
 		$this->assertSame(FALSE, $categories);
 	}

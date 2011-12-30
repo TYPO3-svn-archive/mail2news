@@ -26,7 +26,7 @@ class tx_mail2news_scheduler_start extends tx_scheduler_Task {
 		define("PATH_uploads_pics", PATH_site."uploads/pics/");
 		define("PATH_uploads_media", PATH_site."uploads/media/");
 
-		$class = t3lib_div::makeInstanceClassName('tx_mail2news_getmail');
+		$class = t3lib_div::makeInstance('tx_mail2news_getmail');
 		$main = new $class();
 		$main->process_all_importers(unserialize($GLOBALS['TYPO3_CONF_VARS']['EXT']['extConf']['mail2news']));
 

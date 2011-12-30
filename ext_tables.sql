@@ -37,3 +37,36 @@ CREATE TABLE tx_mail2news_importer (
 	PRIMARY KEY (uid),
 	KEY parent (pid)
 );
+
+
+#
+# Update Table structure for table 'tt_news'
+#
+CREATE TABLE tt_news (
+	is_dummy_record tinyint(1) unsigned DEFAULT '0' NOT NULL,
+	KEY phpunit_dummy (is_dummy_record)
+);
+
+#
+# Update Table structure for table 'tt_news_cat'
+#
+CREATE TABLE tt_news_cat (
+	is_dummy_record tinyint(1) unsigned DEFAULT '0' NOT NULL,
+	KEY phpunit_dummy (is_dummy_record)
+);
+
+#
+# Update Table structure for table 'tx_t3blog_post'
+#
+CREATE TABLE tx_t3blog_post (
+	is_dummy_record tinyint(1) unsigned DEFAULT '0' NOT NULL,
+	KEY phpunit_dummy (is_dummy_record)
+);
+
+#
+# Update Table structure for table 'tx_t3blog_cat'
+#
+CREATE TABLE tx_t3blog_cat (
+	is_dummy_record tinyint(1) unsigned DEFAULT '0' NOT NULL,
+	KEY phpunit_dummy (is_dummy_record)
+);

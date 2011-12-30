@@ -73,8 +73,6 @@ class tx_mail2news_getmail extends t3lib_cli {
 	 */
 	function process_all_importers($emConf) {
 
-		global $TYPO3_DB;
-
 		/**
 		 * Modify configuration keys for backwards compatibility
 		 * Change case to lower, and adjust 2 keynames
@@ -91,11 +89,11 @@ class tx_mail2news_getmail extends t3lib_cli {
 		$table = 'tx_mail2news_importer';
 		// select all active records
 		$where = '1=1' . t3lib_BEfunc::BEenableFields($table) . t3lib_BEfunc::deleteClause($table);
-		$res = $TYPO3_DB->exec_SELECTquery('*', $table, $where, '', 'sorting');
+		$res = $GLOBALS['TYPO3_DB']->exec_SELECTquery('*', $table, $where, '', 'sorting');
 
-		if($TYPO3_DB->sql_num_rows($res)> 0) {
+		if($GLOBALS['TYPO3_DB']->sql_num_rows($res)> 0) {
 			// mail2news importer records found, execute import script for each record
-			while (false !== ($ar = $TYPO3_DB->sql_fetch_assoc($res))) {
+			while (false !== ($ar = $GLOBALS['TYPO3_DB']->sql_fetch_assoc($res))) {
 				$obligatory_parameters = array_intersect_key($ar, array_flip(array('pid', 'allowed_senders')));
 				$mailbox_parameters = array_intersect_key($ar, array_flip(array('mail_server', 'mail_username', 'mail_password',
 					'imap', 'usessl', 'self_signed_certificate', 'portno', 'delete_after_download', 'delete_rejected_mail')));
@@ -116,7 +114,6 @@ class tx_mail2news_getmail extends t3lib_cli {
 				}
 
 				$this->getmail($importerConf);
-
 			}
 
 		} else {
@@ -124,7 +121,7 @@ class tx_mail2news_getmail extends t3lib_cli {
 			// (this is also how the extension worked until version 1.9.6)
 			$this->getmail($emConf);
 		}
-
+		
 	}
 
 	function override_parameters($emConf, $override) {
@@ -152,11 +149,13 @@ class tx_mail2news_getmail extends t3lib_cli {
 		switch ($conf['record_type']) {
 			// t3blog
 			case 't3blog':
-				if ( t3lib_extMgm::isLoaded('t3blog') ) {
+				if (t3lib_extMgm::isLoaded('t3blog')) {
 					$record = t3lib_div::makeInstance('tx_mail2news_t3blog');
 					// Override ttnews categories with t3blog cats, would prefer a generic solution, but it's
 					// difficult to change TCA dynamically (field for selecting both news and blog categories)
-					if ( isset( $conf['default_t3blog_category'] ) ) $conf['default_category'] = $conf['default_t3blog_category'];
+					if (isset($conf['default_t3blog_category'])) {
+						$conf['default_category'] = $conf['default_t3blog_category'];
+					}
 				} else {
 					// throw exception
 				}
@@ -180,113 +179,105 @@ class tx_mail2news_getmail extends t3lib_cli {
 		}
 		$imap->set_targetcharset($this->targetcharset);
 
-		$imap->imap_connect($conf['mail_server'], $conf['mail_username'], $conf['mail_password'], $conf);
-		$itemadded = FALSE;
-		$count = $imap->imap_count_headers($imap);
+		if ($imap->imap_connect($conf['mail_server'], $conf['mail_username'], $conf['mail_password'], $conf) !== FALSE) {
+			$itemadded = FALSE;
+			$count = $imap->imap_count_headers($imap);
 
-		for ($msgno = 1; $msgno <= $count; $msgno++) {
+			for ($msgno = 1; $msgno <= $count; $msgno++) {
 
-			$header = $imap->imap_get_message_header($msgno);
-			if ($this->matchemail($conf['allowed_senders'], $header['fromemail'])) {
+				$header = $imap->imap_get_message_header($msgno);
+				if ($this->matchemail($conf['allowed_senders'], $header['fromemail'])) {
 
-				$bodyparts = $imap->imap_get_message_body($msgno);
-				$body = $this->storebodyparts($bodyparts);
-				$msg = array_merge($header, $body);
-		#		t3lib_div::debug($msg, '$msg');
-		#		return;
+					$bodyparts = $imap->imap_get_message_body($msgno);
+					$body = $this->storebodyparts($bodyparts);
+					$msg = array_merge($header, $body);
 
-				// Read category selector and subheader, if present, from message body text
-				$bodytext_array = explode("\r\n", $msg['bodytext']);
+					// Read category selector and subheader, if present, from message body text
+					$bodytext_array = explode("\r\n", $msg['bodytext']);
 
-				// Get the marker values from the first lines of the email message
-				// Parse $bodytext while it's still an array of message lines
-				$marker_values = $this->get_marker_values($bodytext_array, $pageTSC['fieldMarkers.']);
+					// Get the marker values from the first lines of the email message
+					// Parse $bodytext while it's still an array of message lines
+					$marker_values = $this->get_marker_values($bodytext_array, $pageTSC['fieldMarkers.']);
 
-				// Implode what's left of bodytext
-				$bodytext = implode(chr(10), $bodytext_array);
+					// Implode what's left of bodytext
+					$bodytext = implode(chr(10), $bodytext_array);
 
-				// Replace URLs and emails with <a href...> elements
-				$bodytext = $this->link_plain_text_urls($bodytext);
+					// Replace URLs and emails with <a href...> elements
+					$bodytext = $this->link_plain_text_urls($bodytext);
 
-				// add <br /> at end of lines and wrap the text in p-tags while we're at it
-				$bodytext = '<p>' . str_replace(chr(10), '<br />', $bodytext) . '</p>';
-				// Replace double line breaks with p-tags, and remove empty space in between (spc, nbsp or tab)
-				$bodytext = preg_replace('/<br \/>(\ |\t|&nbsp;)*<br \/>/', '</p><p>', $bodytext);
-				// Map email msg array to newsitem array
-				$item = array(
+					// add <br /> at end of lines and wrap the text in p-tags while we're at it
+					$bodytext = '<p>' . str_replace(chr(10), '<br />', $bodytext) . '</p>';
+					// Replace double line breaks with p-tags, and remove empty space in between (spc, nbsp or tab)
+					$bodytext = preg_replace('/<br \/>(\ |\t|&nbsp;)*<br \/>/', '</p><p>', $bodytext);
+					// Map email msg array to newsitem array
+					$item = array(
 
-					'bodytext' => $bodytext,
-					'image' => $msg['imagefilenames'],
-					'news_files' => $msg['attachmentfilenames'],
-					'author' => $msg['fromname'],
-					'title' => $msg['subject'],
+						'bodytext' => $bodytext,
+						'image' => $msg['imagefilenames'],
+						'news_files' => $msg['attachmentfilenames'],
+						'author' => $msg['fromname'],
+						'title' => $msg['subject'],
 
-					// newsitem fields below do not need to be encoded
-					'author_email' => $msg['fromemail'],
-					'datetime' => $msg['date'],
+						// newsitem fields below do not need to be encoded
+						'author_email' => $msg['fromemail'],
+						'datetime' => $msg['date'],
 
-				// FOR TESTING:
-				// 'datetime' => time(),
+					// FOR TESTING:
+					// 'datetime' => time(),
 
-					// supply additional fields from configuration defaults
-					'pid' => $conf['pid'],
-					'hidden' => $conf['hide_by_default'],
-					'cruser_id' => $conf['cruser_id']
+						// supply additional fields from configuration defaults
+						'pid' => $conf['pid'],
+						'hidden' => $conf['hide_by_default'],
+						'cruser_id' => $conf['cruser_id']
 
-				);
+					);
 
-				// Add preset values  and values from custom marker/field combinations from TSConfig to record data
-				// First merge with presets so they can also be used as default, then override with marker values
-				$item = array_merge( $item, $pageTSC['fieldPresetValues.'] );
-				$item = array_merge( $item, $marker_values );
-				
-				// Categories is a special case, they need to be processed
-				$categories = $item['categories'];
-				unset( $item['categories'] );
+					// Add preset values  and values from custom marker/field combinations from TSConfig to record data
+					// First merge with presets so they can also be used as default, then override with marker values
+					$item = array_merge( $item, $pageTSC['fieldPresetValues.'] );
+					$item = array_merge( $item, $marker_values );
 
-				// Check categories: first check if categories from message are valid,
-				// if not, check configured default category (from EM config or importer record)
-				if ($categories) $categories = $record->category_ids($categories);
+					// Categories is a special case, they need to be processed
+					$categories = $item['categories'];
+					unset($item['categories']);
 
-				if (!$categories) {
-					if (isset($conf['default_category'])) {
-						$categories = $record->category_ids($conf['default_category']);
+					// Check categories: first check if categories from message are valid,
+					// if not, check configured default category (from EM config or importer record)
+					if ($categories) $categories = $record->category_ids($categories);
+
+					if (!$categories) {
+						if (isset($conf['default_category'])) {
+							$categories = $record->category_ids($conf['default_category']);
+						}
 					}
-				}
-				// Set categories in item only if a valid category has been found
-				if ($categories) $item['tx_mail2news_categories'] = $categories;
+					// Set categories in item only if a valid category has been found
+					if ($categories) $item['tx_mail2news_categories'] = $categories;
 
+					$record->store_record($item, $conf['usetcemain']);
 
-#		$marker_values['title'] = $msg['subject'];
-#		t3lib_div::debug($marker_values, '$marker_values');
-#		t3lib_div::debug($item, '$item');
-#		return;
+					// Set flag so that cache will be cleared when ready
+					$itemadded = TRUE;
 
-				$record->store_record($item, $conf['usetcemain']);
-
-				// Set flag so that cache will be cleared when ready
-				$itemadded = TRUE;
-
-				// mark emails for deletion from server
-				if ($conf['delete_after_download']) {
+					// mark emails for deletion from server
+					if ($conf['delete_after_download']) {
+						$imap->imap_delete_message($msgno);
+					}
+				} elseif ($conf['delete_rejected_mail']) {
 					$imap->imap_delete_message($msgno);
 				}
-			} elseif ($conf['delete_rejected_mail']) {
-				$imap->imap_delete_message($msgno);
+
 			}
 
+			// delete all read emails from server and close connection
+			$imap->imap_disconnect();
+
+			// Clear page cache for pages set in extConf, if new records are not hidden
+			if (!$conf['hide_by_default'] && isset($conf['clearcachecmd']) && $itemadded) {
+				$this->clearpagecache($conf['clearcachecmd']);
+			}
+
+			unset($header, $body, $msg, $item);
 		}
-
-		// delete all read emails from server and close connection
-		$imap->imap_disconnect();
-
-		// Clear page cache for pages set in extConf, if new records are not hidden
-		if (!$conf['hide_by_default'] && isset($conf['clearcachecmd']) && $itemadded) {
-			$this->clearpagecache($conf['clearcachecmd']);
-		}
-
-		unset($header, $body, $msg, $item, $TYPO3_CONF_VARS, $TYPO3_DB);
-
 	}
 
 
@@ -317,10 +308,10 @@ class tx_mail2news_getmail extends t3lib_cli {
 
 		$marker_values = array();
 
-		for ( $i=0 ; $i < count($field_markers) ; $i++ ) {
+		for ($i=0; $i < count($field_markers); $i++) {
 			$parse_text = $bodytext;
 			// Check if first line exists
-			if ( isset($parse_text[0]) ) {
+			if (isset($parse_text[0])) {
 				$current_line = $parse_text[0];
 				array_shift($parse_text);
 				foreach ($field_markers as $fieldname => $marker) {

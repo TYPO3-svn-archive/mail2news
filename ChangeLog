@@ -1,3 +1,30 @@
+11-12-30 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 2.0.1 stable
+	* Fix issue 32865: Category names are not recognized
+	* Fix issue 32875: Compatibility with TYPO3 v4.6.x (also tested on 4.7-dev)
+
+11-10-05 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 2.0.0 beta
+	* Major new features: Now also import email messages into T3BLOG!
+	* Very flexible fieldMarkers feature for setting values in any custom database field (see manual)
+	* support for adding multiple categories (tt_news or t3blog) to an imported item
+	* transformation of readable date fields to tstamps
+
+11-07-16 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 1.9.9 stable
+	* mail2news is now compatible with TYPO3 v4.5.x (ClearCache method was broken due to changes in TYPO3 core)
+	* Improved category recognition & input sanitation
+	* Updated manual
+	* This will be the last version of this 1.x.x branch, a new version will be released later which may require some configuration changes!
+
+10-09-09 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 1.9.8 beta
+	* 8054/8806: Fallback to emConf not working when there are no mail2news configuration records
+
 10-05-18 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
 	* Version 1.9.7 beta

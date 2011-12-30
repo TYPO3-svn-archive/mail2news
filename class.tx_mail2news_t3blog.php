@@ -70,7 +70,7 @@ class tx_mail2news_t3blog {
 	 * @return	string/boolean	csv string category_ids, FALSE if no matching category
 	 */
 	function category_ids($categories) {
-
+		global $TYPO3_DB;
 		$category_ids = FALSE;
 		if(trim($categories!='')) {
 			$cat_array = explode( ',' , $categories );
@@ -82,7 +82,7 @@ class tx_mail2news_t3blog {
 				if (is_numeric($category)) {
 					$condition = 'uid=' . intval($category);
 				} elseif ( trim($category)!='' ) {
-					$condition = 'title LIKE ' . $TYPO3_DB->fullQuoteStr($category, 'tt_news_cat');
+					$condition = 'title LIKE ' . $TYPO3_DB->fullQuoteStr($category, 'tx_t3blog_post_cat');
 				} else {
 					continue;
 				}
@@ -91,7 +91,7 @@ class tx_mail2news_t3blog {
 				$orderBy = 'IF(' . $condition . ', ' . $i++ . ', ' . $orderBy . ')';
 			}
 			$where .= ' )';
-			$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows( 'uid', 'tt_news_cat', $where, '', $orderBy, '', 'uid' );
+			$rows = $TYPO3_DB->exec_SELECTgetRows( 'uid', 'tx_t3blog_post_cat', $where, '', $orderBy, '', 'uid' );
 
 			if (count($rows) >= 1) {
 				$category_ids = implode ( ',' , array_keys($rows) );

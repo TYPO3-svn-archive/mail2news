@@ -64,42 +64,12 @@ class tx_mail2news_ttnews {
 	*/
 
 	/*
-	 *  Check if tt_news category exists. DEPRECATED
-	 *  First checks is $category is category-title, if not, checks if it matches uid.
-	 *  Input: string or integer $category, can be name or uid
-	 *  Output: string category-uid, FALSE if no matching category
-	 */
-	function category_id($category) {
-		global $TYPO3_DB;
-		$rows = $TYPO3_DB->exec_SELECTgetRows(
-			'uid',
-			'tt_news_cat',
-			'title LIKE ' . $TYPO3_DB->fullQuoteStr( trim($category) , 'tt_news_cat') . ' AND deleted=0'
-		);
-
-		$uid = FALSE;
-		if (count($rows) >= 1) {
-			$uid = $rows[0]['uid'];
-		} elseif (is_numeric($category)) {
-			$rows = $TYPO3_DB->exec_SELECTgetRows(
-				'uid',
-				'tt_news_cat',
-				'uid = '. intval($category) . ' AND deleted=0'
-			);
-			if (count($rows) == 1) {
-				$uid = $category;
-			}
-		}
-		return $uid;
-	}
-
-	/*
 	 *  Check if categories exist and return category id's.
 	 *  Input can be category names OR id's (if input is numeric, it's considered an id)
 	 *  Output: csv string category_ids, FALSE if no matching category
 	 */
 	function category_ids($categories) {
-
+		global $TYPO3_DB;
 		$category_ids = FALSE;
 		if(trim($categories!='')) {
 			$cat_array = explode( ',' , $categories );
@@ -120,14 +90,12 @@ class tx_mail2news_ttnews {
 				$orderBy = 'IF(' . $condition . ', ' . $i++ . ', ' . $orderBy . ')';
 			}
 			$where .= ' )';
-			$rows = $GLOBALS['TYPO3_DB']->exec_SELECTgetRows( 'uid', 'tt_news_cat', $where, '', $orderBy, '', 'uid' );
+			$rows = $TYPO3_DB->exec_SELECTgetRows( 'uid', 'tt_news_cat', $where, '', $orderBy, '', 'uid' );
 
 			if (count($rows) >= 1) {
 				$category_ids = implode ( ',' , array_keys($rows) );
 			}
 		}
-	#	t3lib_div::debug($rows, '$rows');
-	#	t3lib_div::debug($category_ids, '$categories');
 		return $category_ids;
 	}
 
