@@ -429,6 +429,9 @@ class tx_mail2news_getmail extends t3lib_cli {
 				// check file extension
 				// store attachment in pics or media
 				// add filename to imagefilenames or attachmentfilenames
+				
+				// Replace not supported characters from filenames: comma's
+				$part['name'] = str_replace(',', '_', $part['name']);
 
 				// Use 'name' instead of 'filename' because filename gets encoded differently
 				$file = pathinfo($part['name']);
