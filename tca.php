@@ -260,6 +260,7 @@ if ( t3lib_extMgm::isLoaded('tt_news') ) {
 	$TCA['tx_mail2news_importer']['columns']['default_category'] = $TCA['tt_news']['columns']['category'];
 	$TCA['tx_mail2news_importer']['columns']['default_category']['label'] = 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.default_category';
 	$TCA['tx_mail2news_importer']['columns']['default_category']['config']['minitems'] = 0;
+	unset($TCA['tx_mail2news_importer']['columns']['default_category']['config']['MM']);
 
 	$TCA['tx_mail2news_importer']['showRecordFieldList'] .= ',default_category';
 	$tabrecord .= ', default_category';
@@ -267,12 +268,13 @@ if ( t3lib_extMgm::isLoaded('tt_news') ) {
 
 if ( t3lib_extMgm::isLoaded('t3blog') ) {
 	$TCA['tx_mail2news_importer']['columns']['record_type']['config']['items'][1] = array('LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.record_type.I.2' , 't3blog');
-	
+
 	// Copy TCA definition of t3blog category field, and only change the label and set it as not-required
 	t3lib_div::loadTCA('tx_t3blog_post');
 	$TCA['tx_mail2news_importer']['columns']['default_t3blog_category'] = $TCA['tx_t3blog_post']['columns']['cat'];
 	$TCA['tx_mail2news_importer']['columns']['default_t3blog_category']['label'] = 'LLL:EXT:mail2news/locallang_db.xml:tx_mail2news_importer.default_t3blog_category';
 	$TCA['tx_mail2news_importer']['columns']['default_t3blog_category']['config']['minitems'] = 0;
+	unset($TCA['tx_mail2news_importer']['columns']['default_t3blog_category']['config']['MM']);
 
 	$TCA['tx_mail2news_importer']['showRecordFieldList'] .= ',default_t3blog_category';
 	$tabrecord .= ', default_t3blog_category';
