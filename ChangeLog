@@ -1,3 +1,16 @@
+12-06-29 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 2.0.3 stable
+	* Fix issue #34508: categories are now assigned correctly again from importer records
+	* Fixed table misspelling (tx_t3blog_post_cat should be tx_t3blog_cat)
+	* Checked compatibiltiy with TYPO3 4.7, tt_news 3.2 and t3blog 1.2
+	* Minor update manual
+
+12-06-26 Loek Hilgersom  <typo3extensions@netcoop.nl>
+
+	* Version 2.0.2 stable
+	* Fix issue 30860: commas in filenames
+
 11-12-30 Loek Hilgersom  <typo3extensions@netcoop.nl>
 
 	* Version 2.0.1 stable
